@@ -2,26 +2,32 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:sammsel/auth/auth_service.dart';
-import 'package:sammsel/auth/login_screen.dart';
+
+// Core Imports
 import 'package:sammsel/core/constants/app_constants.dart';
 import 'package:sammsel/core/theme/app_theme.dart';
 import 'package:sammsel/main_layout.dart';
 
-// Import Dashboard Screens
+// Auth Imports
+import 'package:sammsel/auth/auth_service.dart';
+import 'package:sammsel/auth/login_screen.dart';
+import 'package:sammsel/auth/signup_screen.dart';
+import 'package:sammsel/splash/splash_screen.dart';
+
+// Dashboard Imports
 import 'package:sammsel/dashboard/employee_dashboard.dart';
 import 'package:sammsel/dashboard/manager_dashboard.dart';
 import 'package:sammsel/dashboard/super_admin_dashboard.dart';
 
-// Import other screens
+// Feature Imports
 import 'package:sammsel/reports/reports_screen.dart';
 import 'package:sammsel/profile/profile_screen.dart';
 import 'package:sammsel/visits/visit_entry_screen.dart';
 import 'package:sammsel/expenses/expense_entry_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(
-    // Using ChangeNotifierProvider since AuthService extends ChangeNotifier
     ChangeNotifierProvider<AuthService>(
       create: (_) => AuthService(),
       child: const SamselApp(),
@@ -42,21 +48,34 @@ class _SamselAppState extends State<SamselApp> {
   @override
   void initState() {
     super.initState();
+    // Access authService to build the router
     final authService = Provider.of<AuthService>(context, listen: false);
     _router = _buildRouter(authService);
   }
 
   GoRouter _buildRouter(AuthService authService) {
     return GoRouter(
+      // This listener ensures the router refreshes when auth state changes (login/logout)
       refreshListenable: GoRouterRefreshStream(authService.currentUserRole),
-      initialLocation: '/login',
+      initialLocation: '/splash',
+      debugLogDiagnostics: true, // Helpful for debugging routing issues
       routes: [
+        GoRoute(
+          path: '/splash',
+          builder: (context, state) => const SplashScreen(),
+        ),
         GoRoute(
           path: '/login',
           builder: (context, state) => const LoginScreen(),
         ),
+        GoRoute(
+          path: '/signup',
+          builder: (context, state) => const SignupScreen(),
+        ),
+        // ShellRoute wraps these pages with the MainLayout (Sidebar/Navigation)
         ShellRoute(
           builder: (context, state, child) {
+            // Only show MainLayout if user has a role, otherwise fallback to Login
             return authService.currentRole != UserRole.none
                 ? MainLayout(child: child)
                 : const LoginScreen();
@@ -93,14 +112,23 @@ class _SamselAppState extends State<SamselApp> {
           ],
         ),
       ],
+      // Centralized Redirect Logic
       redirect: (context, state) {
         final loggedIn = authService.currentRole != UserRole.none;
-        final goingToLogin = state.uri.path == '/login';
+        final isGoingToLogin = state.uri.path == '/login';
+        final isGoingToSignup = state.uri.path == '/signup';
+        final isGoingToSplash = state.uri.path == '/splash';
 
-        if (!loggedIn && !goingToLogin) {
+        // 1. Allow Splash Screen to run its course
+        if (isGoingToSplash) return null;
+
+        // 2. If NOT logged in and trying to access private routes, force Login
+        if (!loggedIn && !isGoingToLogin && !isGoingToSignup) {
           return '/login';
         }
-        if (loggedIn && goingToLogin) {
+
+        // 3. If ALREADY logged in and trying to access public auth pages, redirect to Dashboard
+        if (loggedIn && (isGoingToLogin || isGoingToSignup)) {
           switch (authService.currentRole) {
             case UserRole.superAdmin:
               return '/super_admin_dashboard';
@@ -112,6 +140,8 @@ class _SamselAppState extends State<SamselApp> {
               return '/login';
           }
         }
+
+        // 4. Default: Allow navigation
         return null;
       },
     );
@@ -122,16 +152,13 @@ class _SamselAppState extends State<SamselApp> {
     return MaterialApp.router(
       title: AppConstants.appTitle,
       debugShowCheckedModeBanner: false,
-
-      // --- THIS IS THE KEY CHANGE ---
       theme: AppTheme.lightTheme,
-      // ----------------------------
-
       routerConfig: _router,
     );
   }
 }
 
+/// Helper class to convert a Stream into a Listenable for GoRouter
 class GoRouterRefreshStream extends ChangeNotifier {
   GoRouterRefreshStream(Stream<dynamic> stream) {
     notifyListeners();

@@ -54,8 +54,11 @@ class _ExpenseEntryScreenState extends State<ExpenseEntryScreen> {
               onPrimary: Colors.white,
               onSurface: Colors.white,
             ),
-            dialogBackgroundColor: AppConstants.secondaryBackgroundColorDark,
-            useMaterial3: true,
+            // UPDATED: dialogBackgroundColor is deprecated, moved to dialogTheme
+            dialogTheme: const DialogThemeData(
+              backgroundColor: AppConstants.secondaryBackgroundColorDark,
+            ),
+            // UPDATED: useMaterial3 is deprecated (default true now), removed
           ),
           child: child!,
         );
@@ -118,7 +121,8 @@ class _ExpenseEntryScreenState extends State<ExpenseEntryScreen> {
                       const SizedBox(height: 20),
                       // Travel Mode Dropdown
                       DropdownButtonFormField<String>(
-                        value: _selectedTravelMode,
+                        // UPDATED: Using initialValue as value is deprecated in newer Flutter versions for this context
+                        initialValue: _selectedTravelMode,
                         dropdownColor: AppConstants.secondaryBackgroundColorDark,
                         hint: const Text('Select Travel Mode', style: TextStyle(color: Colors.white54)),
                         style: const TextStyle(color: Colors.white, fontSize: 15),
@@ -127,14 +131,15 @@ class _ExpenseEntryScreenState extends State<ExpenseEntryScreen> {
                           labelStyle: const TextStyle(color: Colors.white70),
                           prefixIcon: const Icon(Icons.commute_outlined, color: Colors.white70),
                           filled: true,
-                          fillColor: Colors.white.withOpacity(0.05),
+                          // UPDATED: using withValues instead of withOpacity
+                          fillColor: Colors.white.withValues(alpha: 0.05),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-                            borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+                            borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-                            borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+                            borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(AppConstants.borderRadius),
@@ -204,9 +209,9 @@ class _ExpenseEntryScreenState extends State<ExpenseEntryScreen> {
                         child: Container(
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.05),
+                            color: Colors.white.withValues(alpha: 0.05),
                             borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-                            border: Border.all(color: Colors.white.withOpacity(0.1), style: BorderStyle.solid),
+                            border: Border.all(color: Colors.white.withValues(alpha: 0.1), style: BorderStyle.solid),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,

@@ -160,7 +160,7 @@ class _ChartPainter extends CustomPainter {
 
     final fillPaint = Paint()
       ..shader = LinearGradient(
-        colors: [const Color(0xFFFF4081).withOpacity(0.3), Colors.white.withOpacity(0.0)],
+        colors: [const Color(0xFFFF4081).withValues(alpha: 0.3), Colors.white.withValues(alpha: 0.0)],
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))

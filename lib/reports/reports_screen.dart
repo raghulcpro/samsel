@@ -78,17 +78,19 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 child: ListView.separated(
                   physics: const BouncingScrollPhysics(),
                   itemCount: _mockReports.length,
-                  separatorBuilder: (context, index) => Divider(color: Colors.white.withOpacity(0.05), height: 1),
+                  // UPDATED: withOpacity -> withValues
+                  separatorBuilder: (context, index) => Divider(color: Colors.white.withValues(alpha: 0.05), height: 1),
                   itemBuilder: (context, index) {
                     final item = _mockReports[index];
                     final bool isExpense = item['type'] == 'Expense';
-                    
+
                     return ListTile(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                       leading: Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: (isExpense ? AppConstants.accentColorDark : AppConstants.accentColorLight).withOpacity(0.1),
+                          // UPDATED: withOpacity -> withValues
+                          color: (isExpense ? AppConstants.accentColorDark : AppConstants.accentColorLight).withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
@@ -105,7 +107,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
                         padding: const EdgeInsets.only(top: 4.0),
                         child: Text(
                           '${item['type']} • ${item['date']}',
-                          style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13),
+                          // UPDATED: withOpacity -> withValues
+                          style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 13),
                         ),
                       ),
                       trailing: Text(
@@ -132,9 +135,11 @@ class _ReportsScreenState extends State<ReportsScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        // UPDATED: withOpacity -> withValues
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        // UPDATED: withOpacity -> withValues
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

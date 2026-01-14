@@ -55,8 +55,10 @@ class _VisitEntryScreenState extends State<VisitEntryScreen> {
               onPrimary: Colors.white,
               onSurface: Colors.white,
             ),
-            dialogBackgroundColor: AppConstants.secondaryBackgroundColorDark,
-            useMaterial3: true,
+            // UPDATED: dialogBackgroundColor moved to DialogThemeData
+            dialogTheme: const DialogThemeData(
+              backgroundColor: AppConstants.secondaryBackgroundColorDark,
+            ),
           ),
           child: child!,
         );
@@ -82,8 +84,10 @@ class _VisitEntryScreenState extends State<VisitEntryScreen> {
               onPrimary: Colors.white,
               onSurface: Colors.white,
             ),
-            dialogBackgroundColor: AppConstants.secondaryBackgroundColorDark,
-            useMaterial3: true,
+            // UPDATED: dialogBackgroundColor moved to DialogThemeData
+            dialogTheme: const DialogThemeData(
+              backgroundColor: AppConstants.secondaryBackgroundColorDark,
+            ),
           ),
           child: child!,
         );
@@ -147,7 +151,8 @@ class _VisitEntryScreenState extends State<VisitEntryScreen> {
                       ),
                       const SizedBox(height: 20),
                       DropdownButtonFormField<String>(
-                        value: _selectedInstitutionType,
+                        // UPDATED: Changed value to initialValue
+                        initialValue: _selectedInstitutionType,
                         dropdownColor: AppConstants.secondaryBackgroundColorDark,
                         hint: const Text('Select Institution Type', style: TextStyle(color: Colors.white54)),
                         style: const TextStyle(color: Colors.white, fontSize: 15),
@@ -156,14 +161,15 @@ class _VisitEntryScreenState extends State<VisitEntryScreen> {
                           labelStyle: const TextStyle(color: Colors.white70),
                           prefixIcon: const Icon(Icons.category_outlined, color: Colors.white70),
                           filled: true,
-                          fillColor: Colors.white.withOpacity(0.05),
+                          // UPDATED: withOpacity -> withValues
+                          fillColor: Colors.white.withValues(alpha: 0.05),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-                            borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+                            borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-                            borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+                            borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(AppConstants.borderRadius),

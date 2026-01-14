@@ -119,7 +119,7 @@ class ManagerDashboard extends StatelessWidget {
                 minimumSize: const Size(double.infinity, 56),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                 elevation: 4,
-                shadowColor: const Color(0xFFF50057).withOpacity(0.4),
+                shadowColor: const Color(0xFFF50057).withValues(alpha: 0.4),
               ),
             ),
           ),
@@ -171,6 +171,6 @@ class ManagerDashboard extends StatelessWidget {
   }
 
   Widget _buildDivider() {
-    return Divider(color: Colors.grey.withOpacity(0.1), height: 1, indent: 70, endIndent: 20);
+    return Divider(color: Colors.grey.withValues(alpha: 0.1), height: 1, indent: 70, endIndent: 20);
   }
 }
