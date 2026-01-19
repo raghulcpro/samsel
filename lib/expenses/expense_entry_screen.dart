@@ -23,6 +23,7 @@ class _ExpenseEntryScreenState extends State<ExpenseEntryScreen> {
   String? _selectedTravelMode;
   final List<String> _travelModes = [
     'Car',
+    'Rental Bike',
     'Train',
     'Bus',
     'Flight',
@@ -169,7 +170,7 @@ class _ExpenseEntryScreenState extends State<ExpenseEntryScreen> {
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
                         ],
-                        prefixIcon: const Icon(Icons.attach_money_outlined, color: Colors.white70),
+                        prefixIcon: const Icon(Icons.currency_rupee, color: Colors.white70),
                         validator: (value) {
                           if (value == null || value.isEmpty) return 'Please enter the amount';
                           if (double.tryParse(value) == null) return 'Please enter a valid number';

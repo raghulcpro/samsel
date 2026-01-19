@@ -12,9 +12,9 @@ class ReportsScreen extends StatefulWidget {
 class _ReportsScreenState extends State<ReportsScreen> {
   final List<Map<String, String>> _mockReports = [
     {'date': '2023-10-25', 'name': 'John Doe', 'type': 'Visit', 'location': 'Metropolis High'},
-    {'date': '2023-10-24', 'name': 'Jane Smith', 'type': 'Expense', 'amount': '\$120.00'},
+    {'date': '2023-10-24', 'name': 'Jane Smith', 'type': 'Expense', 'amount': '₹120.00'},
     {'date': '2023-10-24', 'name': 'Alice Wong', 'type': 'Visit', 'location': 'Gotham Academy'},
-    {'date': '2023-10-23', 'name': 'Bob Ross', 'type': 'Expense', 'amount': '\$45.50'},
+    {'date': '2023-10-23', 'name': 'Bob Ross', 'type': 'Expense', 'amount': '₹45.50'},
   ];
 
   @override
