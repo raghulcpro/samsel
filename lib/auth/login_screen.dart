@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:sammsel/auth/auth_service.dart';
-import 'package:sammsel/auth/signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,6 +16,10 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  // Role Selection State
+  String _selectedRole = 'Executive'; // Default value
+  final List<String> _roles = ['Admin', 'Manager', 'Executive'];
 
   late AnimationController _animationController;
   late Animation<double> _opacityAnimation;
@@ -55,10 +59,13 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
       final authService = context.read<AuthService>();
+
+      // Note: In a real app, you might send _selectedRole to the server too
       final success = await authService.login(
         _emailController.text.trim(),
         _passwordController.text.trim(),
       );
+
       if (!success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: const Text('Invalid Credentials'), backgroundColor: _accentPink),
@@ -94,7 +101,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // --- UPDATED LOGO SECTION (Fixed: Uses Icon) ---
+                        // --- LOGO ---
                         Container(
                           width: 80,
                           height: 80,
@@ -109,11 +116,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                               )
                             ],
                           ),
-                          child: const Icon(
-                            Icons.menu_book_rounded,
-                            color: Colors.white,
-                            size: 40,
-                          ),
+                          child: const Icon(Icons.menu_book_rounded, color: Colors.white, size: 40),
                         ),
                         const SizedBox(height: 24),
 
@@ -130,6 +133,37 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         ),
                         const SizedBox(height: 40),
 
+                        // --- NEW: ROLE SCROLL BUTTON (DROPDOWN) ---
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: _inputFill,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: DropdownButtonFormField<String>(
+                            initialValue: _selectedRole,
+                            decoration: const InputDecoration(
+                              icon: Icon(Icons.work_outline_rounded, color: Colors.grey),
+                              border: InputBorder.none,
+                            ),
+                            style: TextStyle(color: _textDark, fontSize: 16, fontWeight: FontWeight.w500),
+                            dropdownColor: Colors.white,
+                            items: _roles.map((String role) {
+                              return DropdownMenuItem<String>(
+                                value: role,
+                                child: Text(role),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                _selectedRole = newValue!;
+                              });
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // --- EMAIL ---
                         _buildTextField(
                           controller: _emailController,
                           hintText: "Email address",
@@ -138,6 +172,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         ),
                         const SizedBox(height: 16),
 
+                        // --- PASSWORD ---
                         _buildTextField(
                           controller: _passwordController,
                           hintText: "Password",
@@ -158,6 +193,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         ),
                         const SizedBox(height: 20),
 
+                        // --- LOGIN BUTTON ---
                         Container(
                           width: double.infinity,
                           height: 55,
@@ -193,7 +229,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             Text("Don't have an account? ", style: TextStyle(color: _textDark)),
                             GestureDetector(
                               onTap: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => const SignupScreen()));
+                                context.push('/signup');
                               },
                               child: Text("Sign Up", style: TextStyle(color: _accentPink, fontWeight: FontWeight.bold)),
                             ),
