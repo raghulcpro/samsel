@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sammsel/widgets/custom_card.dart';
-import 'package:sammsel/core/theme/app_theme.dart';
+import 'package:sammsel/core/constants/app_constants.dart';
 
 class SuperAdminDashboard extends StatelessWidget {
   const SuperAdminDashboard({super.key});
@@ -9,38 +8,23 @@ class SuperAdminDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: false,
-        title: const Row(
-          children: [
-            Icon(Icons.shield, color: AppTheme.primaryPink),
-            SizedBox(width: 8),
-            Text(
-              'Samsel',
-              style: TextStyle(
-                fontFamily: 'BrushScript',
-                color: Color(0xFFD8276A),
-                fontSize: 28,
-                letterSpacing: 1.2,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.person_outline_rounded, color: Colors.black54),
-          ),
-        ],
-      ),
+      backgroundColor: Colors.transparent,
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(24.0),
+        physics: const BouncingScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header
+            const Row(
+              children: [
+                Icon(Icons.shield_rounded, color: AppConstants.accentColorLight, size: 28),
+                SizedBox(width: 12),
+                Text('Admin Console', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppConstants.textDark)),
+              ],
+            ),
+            const SizedBox(height: 24),
+
             // 1. Top Stats Grid
             GridView.count(
               shrinkWrap: true,
@@ -48,154 +32,85 @@ class SuperAdminDashboard extends StatelessWidget {
               crossAxisCount: 2,
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
-              childAspectRatio: 0.85,
+              childAspectRatio: 1.1,
               children: [
-                _buildPinkStatCard(context, 'Total Locations', '142', '+12% Last Month', Icons.location_on_outlined),
-                _buildPinkStatCard(context, 'Total Managers', '28', '+5% Last Month', Icons.business_center_outlined),
-                _buildPinkStatCard(context, 'Total Employees', '850', '-2% Last Month', Icons.people_outline),
-                _buildPinkStatCard(context, 'Total Visits Today', '1.2K', '+18% Since Yesterday', Icons.bar_chart_rounded),
+                _buildPinkStatCard('Locations', '142', '+12%', Icons.location_on_outlined),
+                _buildPinkStatCard('Managers', '28', '+5%', Icons.business_center_outlined),
+                _buildPinkStatCard('Employees', '850', '-2%', Icons.people_outline),
+                _buildPinkStatCard('Visits', '1.2K', '+18%', Icons.bar_chart_rounded),
               ],
             ),
             const SizedBox(height: 24),
 
-            // 2. Daily Activity Trend (Chart Card)
-            CustomCard(
-              color: const Color(0xFFFCE4EC),
-              padding: const EdgeInsets.all(24),
+            // 2. Navigation Actions
+            const Text("Quick Management", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppConstants.textDark)),
+            const SizedBox(height: 16),
+
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [BoxShadow(color: Colors.grey.withValues(alpha: 0.05), blurRadius: 10)],
+              ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Daily Activity Trend', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  const Text('Insights into user engagement over the last week.', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    height: 80,
-                    width: double.infinity,
-                    child: CustomPaint(
-                      painter: _ChartPainter(),
-                    ),
-                  ),
+                  _buildNavTile(context, 'Manage Locations', Icons.map_outlined, () {}),
+                  Divider(height: 1, color: Colors.grey.withValues(alpha: 0.1)),
+                  _buildNavTile(context, 'Manage Employees', Icons.badge_outlined, () => context.go('/employee_dashboard')),
+                  Divider(height: 1, color: Colors.grey.withValues(alpha: 0.1)),
+                  _buildNavTile(context, 'System Reports', Icons.file_copy_outlined, () => context.go('/reports')),
                 ],
               ),
             ),
-            const SizedBox(height: 24),
-
-            // 3. Bottom Navigation Grid
-            GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 2,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              childAspectRatio: 1.5,
-              children: [
-                _buildNavAction(context, 'Locations\nManagement', Icons.gps_fixed, () {}),
-                _buildNavAction(context, 'Managers\nAccounts', Icons.manage_accounts, () {}),
-                _buildNavAction(context, 'Employees\nDirectory', Icons.groups, () => context.go('/employee_dashboard')),
-                _buildNavAction(context, 'Reports &\nExport', Icons.description_outlined, () => context.go('/reports')),
-              ],
-            ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 100),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildPinkStatCard(BuildContext context, String title, String value, String subtext, IconData icon) {
-    final bool isPositive = subtext.contains('+');
-    return CustomCard(
-      color: const Color(0xFFFCE4EC),
+  Widget _buildPinkStatCard(String title, String value, String growth, IconData icon) {
+    return Container(
       padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [BoxShadow(color: Colors.grey.withValues(alpha: 0.05), blurRadius: 10)],
+        border: Border.all(color: AppConstants.primaryBgTop),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Icon(icon, color: AppTheme.primaryPink, size: 28),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Icon(icon, color: AppConstants.accentColorLight, size: 24),
+              Text(growth, style: const TextStyle(color: Colors.green, fontSize: 12, fontWeight: FontWeight.bold)),
+            ],
+          ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: const TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.w500)),
-              const SizedBox(height: 4),
-              Text(value, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black87)),
+              Text(value, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: AppConstants.textDark)),
+              Text(title, style: const TextStyle(fontSize: 13, color: AppConstants.textLight)),
             ],
           ),
-          Row(
-            children: [
-              Icon(
-                isPositive ? Icons.arrow_outward_rounded : Icons.arrow_downward_rounded,
-                size: 14,
-                color: isPositive ? Colors.green : Colors.redAccent,
-              ),
-              const SizedBox(width: 4),
-              Expanded(
-                child: Text(
-                  subtext,
-                  style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
-                      color: isPositive ? Colors.green.shade700 : Colors.redAccent.shade700
-                  ),
-                  maxLines: 2,
-                ),
-              ),
-            ],
-          )
         ],
       ),
     );
   }
 
-  Widget _buildNavAction(BuildContext context, String label, IconData icon, VoidCallback onTap) {
-    return CustomCard(
-      color: const Color(0xFFFCE4EC),
+  Widget _buildNavTile(BuildContext context, String title, IconData icon, VoidCallback onTap) {
+    return ListTile(
       onTap: onTap,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, color: AppTheme.primaryPink, size: 28),
-          const SizedBox(height: 12),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-          ),
-        ],
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(color: AppConstants.inputFill, borderRadius: BorderRadius.circular(10)),
+        child: Icon(icon, color: AppConstants.textDark, size: 20),
       ),
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600, color: AppConstants.textDark)),
+      trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Colors.grey),
     );
   }
-}
-
-class _ChartPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFFD8276A) // Updated to brand color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3
-      ..strokeCap = StrokeCap.round;
-
-    final fillPaint = Paint()
-      ..shader = LinearGradient(
-        colors: [
-          const Color(0xFFD8276A).withValues(alpha: 0.2), // Updated syntax
-          Colors.transparent,
-        ],
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
-      ..style = PaintingStyle.fill;
-
-    final path = Path();
-    path.moveTo(0, size.height * 0.8);
-    path.quadraticBezierTo(size.width * 0.25, size.height * 0.9, size.width * 0.5, size.height * 0.5);
-    path.quadraticBezierTo(size.width * 0.75, size.height * 0.1, size.width, size.height * 0.4);
-
-    canvas.drawPath(path, fillPaint..style = PaintingStyle.fill); // Draw fill first
-    canvas.drawPath(path, paint); // Draw line on top
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

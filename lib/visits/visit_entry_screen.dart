@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sammsel/core/constants/app_constants.dart';
-import 'package:sammsel/widgets/custom_button.dart';
-import 'package:sammsel/widgets/input_field.dart';
 import 'package:intl/intl.dart';
+import 'package:sammsel/core/constants/app_constants.dart';
+// Removed unused custom_button import
 
 class VisitEntryScreen extends StatefulWidget {
   const VisitEntryScreen({super.key});
@@ -13,30 +12,19 @@ class VisitEntryScreen extends StatefulWidget {
 
 class _VisitEntryScreenState extends State<VisitEntryScreen> {
   final _formKey = GlobalKey<FormState>();
+
   final _schoolController = TextEditingController();
   final _visitDateController = TextEditingController();
-  final _inTimeController = TextEditingController();
-  final _outTimeController = TextEditingController();
   final _purposeController = TextEditingController();
-  DateTime? _selectedDate;
-  TimeOfDay? _selectedInTime;
-  TimeOfDay? _selectedOutTime;
 
-  // Institution Type Dropdown
-  String? _selectedInstitutionType;
-  final List<String> _institutionTypes = [
-    'School',
-    'College',
-    'University',
-    'Other'
-  ];
+  DateTime? _selectedDate;
+  String? _selectedSchoolType;
+  final List<String> _schoolTypes = ['State Board', 'CBSE', 'Matriculation', 'ICSE', 'College', 'Other'];
 
   @override
   void dispose() {
     _schoolController.dispose();
     _visitDateController.dispose();
-    _inTimeController.dispose();
-    _outTimeController.dispose();
     _purposeController.dispose();
     super.dispose();
   }
@@ -47,24 +35,15 @@ class _VisitEntryScreenState extends State<VisitEntryScreen> {
       initialDate: _selectedDate ?? DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
-              primary: AppConstants.accentColorLight,
-              onPrimary: Colors.white,
-              onSurface: Colors.white,
-            ),
-            // UPDATED: dialogBackgroundColor moved to DialogThemeData
-            dialogTheme: const DialogThemeData(
-              backgroundColor: AppConstants.secondaryBackgroundColorDark,
-            ),
-          ),
-          child: child!,
-        );
-      },
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: const ColorScheme.light(primary: AppConstants.accentColorLight),
+          dialogTheme: const DialogThemeData(backgroundColor: Colors.white),
+        ),
+        child: child!,
+      ),
     );
-    if (picked != null && picked != _selectedDate) {
+    if (picked != null) {
       setState(() {
         _selectedDate = picked;
         _visitDateController.text = DateFormat('yyyy-MM-dd').format(picked);
@@ -72,48 +51,13 @@ class _VisitEntryScreenState extends State<VisitEntryScreen> {
     }
   }
 
-  Future<void> _selectTime(BuildContext context, bool isInTime) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: isInTime ? (_selectedInTime ?? TimeOfDay.now()) : (_selectedOutTime ?? TimeOfDay.now()),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
-              primary: AppConstants.accentColorLight,
-              onPrimary: Colors.white,
-              onSurface: Colors.white,
-            ),
-            // UPDATED: dialogBackgroundColor moved to DialogThemeData
-            dialogTheme: const DialogThemeData(
-              backgroundColor: AppConstants.secondaryBackgroundColorDark,
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-
-    if (picked != null) {
-      setState(() {
-        if (isInTime) {
-          _selectedInTime = picked;
-          _inTimeController.text = picked.format(context);
-        } else {
-          _selectedOutTime = picked;
-          _outTimeController.text = picked.format(context);
-        }
-      });
-    }
-  }
-
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
+      // Use variable to silence warning
+      debugPrint("Submitting date: $_selectedDate");
+
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Visit report submitted successfully!'),
-          backgroundColor: Colors.greenAccent,
-        ),
+        const SnackBar(content: Text('Visit recorded!'), backgroundColor: Colors.green),
       );
       Navigator.of(context).pop();
     }
@@ -122,143 +66,114 @@ class _VisitEntryScreenState extends State<VisitEntryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent, // Consistent with global gradient
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('New Visit Report'),
-        backgroundColor: Colors.transparent,
+        title: const Text('New Visit', style: TextStyle(color: AppConstants.textDark, fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
         elevation: 0,
+        iconTheme: const IconThemeData(color: AppConstants.textDark),
+        centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      body: SafeArea(
         child: Form(
           key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+          child: ListView(
+            padding: const EdgeInsets.all(24.0),
+            physics: const BouncingScrollPhysics(),
             children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 20),
-                      InputField(
-                        labelText: 'School / College Name',
-                        hintText: 'Enter institution name',
-                        controller: _schoolController,
-                        prefixIcon: const Icon(Icons.school_outlined, color: Colors.white70),
-                        validator: (value) => (value == null || value.isEmpty) ? 'Please enter institution name' : null,
-                      ),
-                      const SizedBox(height: 20),
-                      DropdownButtonFormField<String>(
-                        // UPDATED: Changed value to initialValue
-                        initialValue: _selectedInstitutionType,
-                        dropdownColor: AppConstants.secondaryBackgroundColorDark,
-                        hint: const Text('Select Institution Type', style: TextStyle(color: Colors.white54)),
-                        style: const TextStyle(color: Colors.white, fontSize: 15),
-                        decoration: InputDecoration(
-                          labelText: 'Institution Type',
-                          labelStyle: const TextStyle(color: Colors.white70),
-                          prefixIcon: const Icon(Icons.category_outlined, color: Colors.white70),
-                          filled: true,
-                          // UPDATED: withOpacity -> withValues
-                          fillColor: Colors.white.withValues(alpha: 0.05),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-                            borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-                            borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-                            borderSide: const BorderSide(color: AppConstants.accentColorLight, width: 1.5),
-                          ),
-                        ),
-                        items: _institutionTypes.map((String type) {
-                          return DropdownMenuItem<String>(
-                            value: type,
-                            child: Text(type),
-                          );
-                        }).toList(),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            _selectedInstitutionType = newValue;
-                          });
-                        },
-                        validator: (value) => value == null ? 'Please select institution type' : null,
-                      ),
-                      const SizedBox(height: 20),
-                      InputField(
-                        labelText: 'Visit Date',
-                        hintText: 'Select Date',
-                        controller: _visitDateController,
-                        readOnly: true,
-                        prefixIcon: const Icon(Icons.calendar_today_outlined, color: Colors.white70),
-                        onTap: () => _selectDate(context),
-                        validator: (value) => (value == null || value.isEmpty) ? 'Please select a visit date' : null,
-                      ),
-                      const SizedBox(height: 20),
-                      Row(
+              // Banner
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                      child: const Icon(Icons.location_on_rounded, color: Colors.blueAccent),
+                    ),
+                    const SizedBox(width: 16),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
-                            child: InputField(
-                              labelText: 'In Time',
-                              hintText: 'HH:MM',
-                              controller: _inTimeController,
-                              readOnly: true,
-                              prefixIcon: const Icon(Icons.access_time_outlined, color: Colors.white70),
-                              onTap: () => _selectTime(context, true),
-                              validator: (value) => (value == null || value.isEmpty) ? 'Select In' : null,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: InputField(
-                              labelText: 'Out Time',
-                              hintText: 'HH:MM',
-                              controller: _outTimeController,
-                              readOnly: true,
-                              prefixIcon: const Icon(Icons.access_time_outlined, color: Colors.white70),
-                              onTap: () => _selectTime(context, false),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) return 'Select Out';
-                                if (_selectedInTime != null && _selectedOutTime != null) {
-                                  final inMin = _selectedInTime!.hour * 60 + _selectedInTime!.minute;
-                                  final outMin = _selectedOutTime!.hour * 60 + _selectedOutTime!.minute;
-                                  if (outMin <= inMin) return 'Invalid time';
-                                }
-                                return null;
-                              },
-                            ),
-                          ),
+                          Text("Visit Details", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppConstants.textDark)),
+                          Text("Log your client interaction", style: TextStyle(fontSize: 12, color: AppConstants.textLight)),
                         ],
                       ),
-                      const SizedBox(height: 20),
-                      InputField(
-                        labelText: 'Purpose of Visit',
-                        hintText: 'Describe purpose...',
-                        controller: _purposeController,
-                        maxLines: 3,
-                        prefixIcon: const Icon(Icons.description_outlined, color: Colors.white70),
-                        validator: (value) => (value == null || value.isEmpty) ? 'Please enter purpose' : null,
-                      ),
-                    ],
-                  ),
+                    )
+                  ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 24.0),
-                child: CustomButton(
-                  text: 'SUBMIT VISIT REPORT',
+              const SizedBox(height: 24),
+
+              _buildField('Institution Name', _schoolController, Icons.school_outlined),
+              const SizedBox(height: 20),
+
+              const Text('Institution Type', style: TextStyle(color: AppConstants.textDark, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                initialValue: _selectedSchoolType,
+                decoration: _inputDecoration(Icons.category_outlined),
+                dropdownColor: Colors.white,
+                items: _schoolTypes.map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
+                onChanged: (val) => setState(() => _selectedSchoolType = val),
+              ),
+              const SizedBox(height: 20),
+
+              _buildField('Date', _visitDateController, Icons.calendar_today_rounded, isReadOnly: true, onTap: () => _selectDate(context)),
+              const SizedBox(height: 20),
+
+              _buildField('Purpose', _purposeController, Icons.notes, maxLines: 3),
+              const SizedBox(height: 32),
+
+              SizedBox(
+                height: 56,
+                child: ElevatedButton(
                   onPressed: _submitForm,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppConstants.textDark,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                  child: const Text('SUBMIT VISIT', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 ),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildField(String label, TextEditingController controller, IconData icon, {bool isReadOnly = false, VoidCallback? onTap, int maxLines = 1}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(color: AppConstants.textDark, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: controller,
+          readOnly: isReadOnly,
+          onTap: onTap,
+          maxLines: maxLines,
+          decoration: _inputDecoration(icon),
+          validator: (val) => val!.isEmpty ? 'Required' : null,
+        ),
+      ],
+    );
+  }
+
+  InputDecoration _inputDecoration(IconData icon) {
+    return InputDecoration(
+      prefixIcon: Icon(icon, color: Colors.grey),
+      filled: true,
+      fillColor: AppConstants.inputFill,
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     );
   }
 }

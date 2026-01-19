@@ -1,10 +1,8 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sammsel/auth/auth_service.dart';
 import 'package:sammsel/core/constants/app_constants.dart';
-import 'package:sammsel/widgets/custom_card.dart';
-import 'package:sammsel/widgets/custom_button.dart';
+
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -12,52 +10,99 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context, listen: false);
-    final roleName = authService.currentRole.name.replaceAll('_', ' ');
+    final roleName = authService.currentRole.name.replaceAll('_', ' ').toUpperCase();
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: const Text('Account Profile'),
+        title: const Text(
+          'My Profile',
+          style: TextStyle(color: AppConstants.textDark, fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
-            const CircleAvatar(
-              radius: 50,
-              backgroundColor: AppConstants.accentColorLight,
-              child: Icon(Icons.person, size: 60, color: Colors.white),
+            // AVATAR SECTION
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: AppConstants.accentColorLight, width: 2),
+              ),
+              child: const CircleAvatar(
+                radius: 50,
+                backgroundColor: AppConstants.inputFill,
+                child: Icon(Icons.person, size: 50, color: AppConstants.textLight),
+              ),
             ),
             const SizedBox(height: 16),
-            Text(
-              'User Name', // Mock name
-              style: Theme.of(context).textTheme.headlineSmall,
+            const Text(
+              'User Name',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppConstants.textDark),
             ),
-            Text(
-              roleName,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppConstants.accentColorDark),
+            const SizedBox(height: 4),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppConstants.accentColorLight.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                roleName,
+                style: const TextStyle(
+                    color: AppConstants.accentColorLight,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12
+                ),
+              ),
             ),
             const SizedBox(height: 32),
-            CustomCard(
+
+            // DETAILS CARD
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withValues(alpha: 0.05),
+                    blurRadius: 20,
+                    offset: const Offset(0, 5),
+                  )
+                ],
+              ),
               child: Column(
                 children: [
                   _buildProfileTile(Icons.email_outlined, 'Email', 'user@samsel.com'),
-                  const Divider(color: Colors.white10),
+                  Divider(color: Colors.grey.withValues(alpha: 0.1)),
                   _buildProfileTile(Icons.badge_outlined, 'Employee ID', 'EMP12345'),
-                  const Divider(color: Colors.white10),
-                  _buildProfileTile(Icons.location_on_outlined, 'Assigned Location', 'Metropolis Branch'),
+                  Divider(color: Colors.grey.withValues(alpha: 0.1)),
+                  _buildProfileTile(Icons.location_on_outlined, 'Location', 'Metropolis Branch'),
                 ],
               ),
             ),
             const SizedBox(height: 40),
+
+            // LOGOUT BUTTON
             SizedBox(
               width: double.infinity,
-              child: CustomButton(
-                text: 'LOGOUT',
-                onPressed: () {
-                  authService.logout();
-                },
+              height: 55,
+              child: ElevatedButton(
+                onPressed: () => authService.logout(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.redAccent,
+                  elevation: 0,
+                  side: const BorderSide(color: Colors.redAccent),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                ),
+                child: const Text('LOGOUT', style: TextStyle(fontWeight: FontWeight.bold)),
               ),
             ),
           ],
@@ -71,13 +116,27 @@ class ProfileScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 12.0),
       child: Row(
         children: [
-          Icon(icon, color: Colors.white54, size: 20),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppConstants.inputFill,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: AppConstants.textLight, size: 20),
+          ),
           const SizedBox(width: 16),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: const TextStyle(color: Colors.white54, fontSize: 12)),
-              Text(value, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500)),
+              Text(label, style: const TextStyle(color: AppConstants.textLight, fontSize: 12)),
+              Text(
+                  value,
+                  style: const TextStyle(
+                      color: AppConstants.textDark,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600
+                  )
+              ),
             ],
           ),
         ],

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:sammsel/widgets/custom_card.dart';
-import 'package:sammsel/core/theme/app_theme.dart';
+import 'package:sammsel/core/constants/app_constants.dart';
+
 
 class ManagerDashboard extends StatelessWidget {
   const ManagerDashboard({super.key});
@@ -8,137 +8,120 @@ class ManagerDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        leading: IconButton(onPressed: (){}, icon: const Icon(Icons.grid_view_rounded)),
-        title: const Column(
+      backgroundColor: Colors.transparent, // Uses MainLayout gradient
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24.0),
+        physics: const BouncingScrollPhysics(),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Central Office Branch', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          ],
-        ),
-        actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.notifications_none_rounded)),
-        ],
-      ),
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            // Header
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // 1. Stats Row
-                Row(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(child: _buildStatBox('42', 'Employees in\nLocation', Icons.people_outline)),
-                    const SizedBox(width: 16),
-                    Expanded(child: _buildStatBox('28', 'Visits Today', Icons.calendar_today_outlined)),
+                    Text('Central Office', style: TextStyle(color: AppConstants.textLight)),
+                    Text('Manager Dashboard', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppConstants.textDark)),
                   ],
                 ),
-                const SizedBox(height: 16),
-
-                // 2. Total Expenses Box
-                CustomCard(
-                  color: const Color(0xFFFCE4EC),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-                        child: const Icon(Icons.account_balance_wallet_outlined, color: AppTheme.primaryPink),
-                      ),
-                      const SizedBox(width: 16),
-                      const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('\$12,500', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                          Text('Total Expenses', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // 3. View All Metrics Button
-                CustomCard(
-                  color: const Color(0xFFFCE4EC),
-                  onTap: () {},
-                  child: const Center(
-                    child: Column(
-                      children: [
-                        Icon(Icons.keyboard_double_arrow_right, color: Colors.black87),
-                        SizedBox(height: 8),
-                        Text('View All Metrics', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                        Text('Detailed Performance', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 32),
-
-                // 4. Employees List Header
-                const Text('Employees in Location', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 16),
-
-                // 5. Employee List
-                CustomCard(
-                  hasShadow: true, // White card with shadow
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Column(
-                    children: [
-                      _buildEmployeeTile('Alice Johnson', 'EMP-001', true),
-                      _buildDivider(),
-                      _buildEmployeeTile('Bob Smith', 'EMP-002', false),
-                      _buildDivider(),
-                      _buildEmployeeTile('Charlie Brown', 'EMP-003', true),
-                      _buildDivider(),
-                      _buildEmployeeTile('Diana Prince', 'EMP-004', true),
-                      _buildDivider(),
-                      _buildEmployeeTile('Ethan Hunt', 'EMP-005', false),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 100), // Space for floating button
+                Icon(Icons.business_rounded, color: AppConstants.accentColorLight, size: 32),
               ],
             ),
-          ),
+            const SizedBox(height: 32),
 
-          // 6. Floating Action Button (Download Report)
-          Positioned(
-            bottom: 20,
-            left: 20,
-            right: 20,
-            child: ElevatedButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.download_rounded, color: Colors.white),
-              label: const Text('Download Excel Report'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFF50057), // Hot Pink
-                minimumSize: const Size(double.infinity, 56),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                elevation: 4,
-                shadowColor: const Color(0xFFF50057).withValues(alpha: 0.4),
+            // 1. Stats Row
+            Row(
+              children: [
+                Expanded(child: _buildStatBox('42', 'Employees', Icons.people_outline)),
+                const SizedBox(width: 16),
+                Expanded(child: _buildStatBox('28', 'Visits', Icons.calendar_today_outlined)),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // 2. Total Expenses Box
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(color: Colors.grey.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 5))
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                        color: AppConstants.accentColorLight.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12)
+                    ),
+                    child: const Icon(Icons.account_balance_wallet_outlined, color: AppConstants.accentColorLight),
+                  ),
+                  const SizedBox(width: 16),
+                  const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('\$12,500', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppConstants.textDark)),
+                      Text('Total Expenses', style: TextStyle(fontSize: 12, color: AppConstants.textLight)),
+                    ],
+                  ),
+                ],
               ),
             ),
-          ),
-        ],
+            const SizedBox(height: 32),
+
+            // 3. Employees List Header
+            const Text('Team Status', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppConstants.textDark)),
+            const SizedBox(height: 16),
+
+            // 4. Employee List
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [BoxShadow(color: Colors.grey.withValues(alpha: 0.05), blurRadius: 10)],
+              ),
+              child: Column(
+                children: [
+                  _buildEmployeeTile('Alice Johnson', 'EMP-001', true),
+                  Divider(height: 1, color: Colors.grey.withValues(alpha: 0.1)),
+                  _buildEmployeeTile('Bob Smith', 'EMP-002', false),
+                  Divider(height: 1, color: Colors.grey.withValues(alpha: 0.1)),
+                  _buildEmployeeTile('Charlie Brown', 'EMP-003', true),
+                ],
+              ),
+            ),
+            const SizedBox(height: 100),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {},
+        backgroundColor: AppConstants.accentColorLight,
+        icon: const Icon(Icons.download_rounded, color: Colors.white),
+        label: const Text('Download Report', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
   }
 
   Widget _buildStatBox(String value, String label, IconData icon) {
-    return CustomCard(
-      color: const Color(0xFFFCE4EC),
-      padding: const EdgeInsets.all(24),
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [BoxShadow(color: Colors.grey.withValues(alpha: 0.05), blurRadius: 10)],
+      ),
       child: Column(
         children: [
-          Icon(icon, color: AppTheme.primaryPink, size: 28),
-          const SizedBox(height: 16),
-          Text(value, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 4),
-          Text(label, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+          Icon(icon, color: AppConstants.accentColorLight, size: 28),
+          const SizedBox(height: 12),
+          Text(value, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: AppConstants.textDark)),
+          Text(label, style: const TextStyle(fontSize: 12, color: AppConstants.textLight)),
         ],
       ),
     );
@@ -146,31 +129,28 @@ class ManagerDashboard extends StatelessWidget {
 
   Widget _buildEmployeeTile(String name, String id, bool visited) {
     return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       leading: CircleAvatar(
-        backgroundColor: Colors.grey.shade200,
-        backgroundImage: NetworkImage('https://ui-avatars.com/api/?name=${name.replaceAll(" ", "+")}&background=random'),
+        backgroundColor: AppConstants.inputFill,
+        child: Text(name[0], style: const TextStyle(color: AppConstants.textDark, fontWeight: FontWeight.bold)),
       ),
-      title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-      subtitle: Text(id, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+      title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppConstants.textDark)),
+      subtitle: Text(id, style: const TextStyle(fontSize: 12, color: AppConstants.textLight)),
       trailing: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: visited ? const Color(0xFFF50057) : Colors.transparent,
+          color: visited ? Colors.green.withValues(alpha: 0.1) : Colors.orange.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
-          visited ? 'Visited' : 'Not Visited',
+          visited ? 'Visited' : 'Pending',
           style: TextStyle(
-            color: visited ? Colors.white : Colors.grey,
+            color: visited ? Colors.green : Colors.orange,
             fontSize: 11,
             fontWeight: FontWeight.bold,
           ),
         ),
       ),
     );
-  }
-
-  Widget _buildDivider() {
-    return Divider(color: Colors.grey.withValues(alpha: 0.1), height: 1, indent: 70, endIndent: 20);
   }
 }
