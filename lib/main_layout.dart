@@ -43,58 +43,58 @@ class MainLayout extends StatelessWidget {
     final selectedIndex = _calculateSelectedIndex(context);
 
     return Scaffold(
-      extendBody: true, // Allows content to show behind the blurred nav bar
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              AppConstants.primaryBackgroundColorDark,
-              AppConstants.secondaryBackgroundColorDark,
+              AppConstants.primaryBgTop,
+              Colors.white,
+              AppConstants.primaryBgTop
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
         ),
-        child: child,
+        child: SafeArea(child: child),
       ),
       bottomNavigationBar: Container(
-        margin: const EdgeInsets.all(20),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(30),
-          child: NavigationBarTheme(
-            data: NavigationBarThemeData(
-              indicatorColor: AppConstants.accentColorLight.withValues(alpha: 0.2),
-              labelTextStyle: WidgetStateProperty.all(
-                const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white70,
-                ),
-              ),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              // FIX: Replaced withOpacity with withValues (newer Flutter)
+              color: AppConstants.accentColorLight.withValues(alpha: 0.1),
+              blurRadius: 20,
+              offset: const Offset(0, -5),
             ),
-            child: NavigationBar(
-              selectedIndex: selectedIndex,
-              onDestinationSelected: (index) => _onItemTapped(index, context, role),
-              backgroundColor: Colors.white.withValues(alpha: 0.05),
-              destinations: const [
-                NavigationDestination(
-                  icon: Icon(Icons.grid_view_rounded, color: Colors.white70),
-                  selectedIcon: Icon(Icons.grid_view_rounded, color: AppConstants.accentColorLight),
-                  label: 'Home',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.analytics_outlined, color: Colors.white70),
-                  selectedIcon: Icon(Icons.analytics_rounded, color: AppConstants.accentColorLight),
-                  label: 'Reports',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.person_outline_rounded, color: Colors.white70),
-                  selectedIcon: Icon(Icons.person_rounded, color: AppConstants.accentColorLight),
-                  label: 'Profile',
-                ),
-              ],
+          ],
+        ),
+        child: BottomNavigationBar(
+          currentIndex: selectedIndex,
+          onTap: (index) => _onItemTapped(index, context, role),
+          backgroundColor: Colors.white,
+          elevation: 0,
+          type: BottomNavigationBarType.fixed,
+          selectedItemColor: AppConstants.accentColorLight,
+          unselectedItemColor: Colors.grey.shade400,
+          showUnselectedLabels: true,
+          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.grid_view_rounded),
+              label: 'Home',
             ),
-          ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.analytics_outlined),
+              activeIcon: Icon(Icons.analytics_rounded),
+              label: 'Reports',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline_rounded),
+              activeIcon: Icon(Icons.person_rounded),
+              label: 'Profile',
+            ),
+          ],
         ),
       ),
     );

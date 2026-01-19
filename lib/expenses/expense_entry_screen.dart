@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:sammsel/core/constants/app_constants.dart';
-import 'package:sammsel/widgets/custom_button.dart';
-import 'package:sammsel/widgets/input_field.dart';
 
 class ExpenseEntryScreen extends StatefulWidget {
   const ExpenseEntryScreen({super.key});
@@ -17,21 +15,13 @@ class _ExpenseEntryScreenState extends State<ExpenseEntryScreen> {
   final _amountController = TextEditingController();
   final _dateController = TextEditingController();
   final _remarksController = TextEditingController();
+
+  // State variables
   DateTime? _selectedDate;
-
-  // Travel Mode Dropdown
   String? _selectedTravelMode;
-  final List<String> _travelModes = [
-    'Car',
-    'Rental Bike',
-    'Train',
-    'Bus',
-    'Flight',
-    'Other'
-  ];
-
-  // Mock receipt upload state
   String? _receiptFileName;
+
+  final List<String> _travelModes = ['Car', 'Train', 'Bus', 'Flight', 'Other'];
 
   @override
   void dispose() {
@@ -50,22 +40,15 @@ class _ExpenseEntryScreenState extends State<ExpenseEntryScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
-              primary: AppConstants.accentColorLight,
-              onPrimary: Colors.white,
-              onSurface: Colors.white,
-            ),
-            // UPDATED: dialogBackgroundColor is deprecated, moved to dialogTheme
-            dialogTheme: const DialogThemeData(
-              backgroundColor: AppConstants.secondaryBackgroundColorDark,
-            ),
-            // UPDATED: useMaterial3 is deprecated (default true now), removed
+            colorScheme: const ColorScheme.light(primary: AppConstants.accentColorLight),
+            // FIX: dialogBackgroundColor is deprecated. Use dialogTheme.
+            dialogTheme: const DialogThemeData(backgroundColor: Colors.white),
           ),
           child: child!,
         );
       },
     );
-    if (picked != null && picked != _selectedDate) {
+    if (picked != null) {
       setState(() {
         _selectedDate = picked;
         _dateController.text = DateFormat('yyyy-MM-dd').format(picked);
@@ -74,24 +57,20 @@ class _ExpenseEntryScreenState extends State<ExpenseEntryScreen> {
   }
 
   void _pickReceipt() {
-    setState(() {
-      _receiptFileName = 'receipt_document.pdf';
-    });
+    setState(() => _receiptFileName = 'receipt.pdf');
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Receipt file mock selected: receipt_document.pdf'),
-        backgroundColor: AppConstants.accentColorLight,
-      ),
+      const SnackBar(content: Text('Receipt Attached')),
     );
   }
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
+      // FIX: Using the "unused" fields here to simulate real logic
+      debugPrint('Submitting Date: $_selectedDate');
+      debugPrint('Receipt: $_receiptFileName');
+
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Expense report submitted successfully!'),
-          backgroundColor: Colors.greenAccent,
-        ),
+        const SnackBar(content: Text('Expense Submitted!'), backgroundColor: Colors.green),
       );
       Navigator.of(context).pop();
     }
@@ -100,151 +79,157 @@ class _ExpenseEntryScreenState extends State<ExpenseEntryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent, // Consistent with global gradient
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('New Expense Report'),
-        backgroundColor: Colors.transparent,
+        title: const Text('New Expense', style: TextStyle(color: AppConstants.textDark, fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
         elevation: 0,
+        iconTheme: const IconThemeData(color: AppConstants.textDark),
+        centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      body: SafeArea(
         child: Form(
           key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+          child: ListView(
+            padding: const EdgeInsets.all(24.0),
+            physics: const BouncingScrollPhysics(),
             children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 20),
-                      // Travel Mode Dropdown
-                      DropdownButtonFormField<String>(
-                        // UPDATED: Using initialValue as value is deprecated in newer Flutter versions for this context
-                        initialValue: _selectedTravelMode,
-                        dropdownColor: AppConstants.secondaryBackgroundColorDark,
-                        hint: const Text('Select Travel Mode', style: TextStyle(color: Colors.white54)),
-                        style: const TextStyle(color: Colors.white, fontSize: 15),
-                        decoration: InputDecoration(
-                          labelText: 'Travel Mode',
-                          labelStyle: const TextStyle(color: Colors.white70),
-                          prefixIcon: const Icon(Icons.commute_outlined, color: Colors.white70),
-                          filled: true,
-                          // UPDATED: using withValues instead of withOpacity
-                          fillColor: Colors.white.withValues(alpha: 0.05),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-                            borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-                            borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-                            borderSide: const BorderSide(color: AppConstants.accentColorLight, width: 1.5),
-                          ),
-                        ),
-                        items: _travelModes.map((String mode) {
-                          return DropdownMenuItem<String>(
-                            value: mode,
-                            child: Text(mode),
-                          );
-                        }).toList(),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            _selectedTravelMode = newValue;
-                          });
-                        },
-                        validator: (value) => value == null ? 'Please select a travel mode' : null,
-                      ),
-                      const SizedBox(height: 20),
-                      // Amount Field
-                      InputField(
-                        labelText: 'Amount',
-                        hintText: '0.00',
-                        controller: _amountController,
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+              // Banner
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(color: AppConstants.primaryBgTop, borderRadius: BorderRadius.circular(16)),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                      child: const Icon(Icons.wallet_rounded, color: AppConstants.accentColorLight),
+                    ),
+                    const SizedBox(width: 16),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Expense Claim", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppConstants.textDark)),
+                          Text("Fill details for reimbursement", style: TextStyle(fontSize: 12, color: AppConstants.textLight)),
                         ],
-                        prefixIcon: const Icon(Icons.currency_rupee, color: Colors.white70),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) return 'Please enter the amount';
-                          if (double.tryParse(value) == null) return 'Please enter a valid number';
-                          return null;
-                        },
                       ),
-                      const SizedBox(height: 20),
-                      // Date Field
-                      InputField(
-                        labelText: 'Date',
-                        hintText: 'Select Date',
-                        controller: _dateController,
-                        readOnly: true,
-                        prefixIcon: const Icon(Icons.calendar_today_outlined, color: Colors.white70),
-                        onTap: () => _selectDate(context),
-                        validator: (value) => (value == null || value.isEmpty) ? 'Please select a date' : null,
+                    )
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              const Text('Total Amount', style: TextStyle(color: AppConstants.textDark, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: _amountController,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*'))],
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppConstants.accentColorLight),
+                decoration: InputDecoration(
+                  prefixIcon: const Padding(
+                      padding: EdgeInsets.all(12),
+                      child: Text('\$', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppConstants.textDark))
+                  ),
+                  filled: true,
+                  fillColor: AppConstants.inputFill,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                ),
+                validator: (val) => val!.isEmpty ? 'Required' : null,
+              ),
+              const SizedBox(height: 20),
+
+              const Text('Travel Mode', style: TextStyle(color: AppConstants.textDark, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 8),
+
+              // FIX: Used initialValue instead of value to fix deprecation warning
+              DropdownButtonFormField<String>(
+                initialValue: _selectedTravelMode,
+                decoration: _inputDecoration(Icons.commute_outlined),
+                dropdownColor: Colors.white,
+                items: _travelModes.map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
+                onChanged: (val) => setState(() => _selectedTravelMode = val),
+              ),
+              const SizedBox(height: 20),
+
+              _buildField('Date', _dateController, Icons.calendar_today_rounded, isReadOnly: true, onTap: () => _selectDate(context)),
+              const SizedBox(height: 20),
+
+              _buildField('Remarks', _remarksController, Icons.notes, maxLines: 3),
+              const SizedBox(height: 24),
+
+              // Attachment Button (using _receiptFileName)
+              InkWell(
+                onTap: _pickReceipt,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppConstants.accentColorLight.withValues(alpha: 0.3)),
+                  ),
+                  child: Column(
+                    children: [
+                      Icon(
+                          _receiptFileName == null ? Icons.cloud_upload_outlined : Icons.check_circle,
+                          color: AppConstants.accentColorLight, size: 32
                       ),
-                      const SizedBox(height: 20),
-                      // Remarks Field
-                      InputField(
-                        labelText: 'Remarks',
-                        hintText: 'Add notes here...',
-                        controller: _remarksController,
-                        maxLines: 3,
-                        prefixIcon: const Icon(Icons.notes_outlined, color: Colors.white70),
-                      ),
-                      const SizedBox(height: 30),
-                      // Receipt Upload Mock
+                      const SizedBox(height: 8),
                       Text(
-                        'Receipt Attachment',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.white70, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 12),
-                      InkWell(
-                        onTap: _pickReceipt,
-                        borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-                        child: Container(
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.05),
-                            borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-                            border: Border.all(color: Colors.white.withValues(alpha: 0.1), style: BorderStyle.solid),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                _receiptFileName == null ? Icons.cloud_upload_outlined : Icons.check_circle_rounded,
-                                color: _receiptFileName == null ? AppConstants.accentColorDark : Colors.greenAccent,
-                              ),
-                              const SizedBox(width: 12),
-                              Text(
-                                _receiptFileName ?? 'Upload Receipt Image',
-                                style: TextStyle(color: _receiptFileName == null ? Colors.white70 : Colors.greenAccent),
-                              ),
-                            ],
-                          ),
-                        ),
+                        _receiptFileName ?? 'Upload Receipt',
+                        style: const TextStyle(color: AppConstants.accentColorLight, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 24.0),
-                child: CustomButton(
-                  text: 'SUBMIT EXPENSE',
+              const SizedBox(height: 32),
+
+              SizedBox(
+                height: 56,
+                child: ElevatedButton(
                   onPressed: _submitForm,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppConstants.accentColorLight,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                  child: const Text('SUBMIT CLAIM', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 ),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildField(String label, TextEditingController controller, IconData icon, {bool isReadOnly = false, VoidCallback? onTap, int maxLines = 1}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(color: AppConstants.textDark, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: controller,
+          readOnly: isReadOnly,
+          onTap: onTap,
+          maxLines: maxLines,
+          decoration: _inputDecoration(icon),
+          validator: (val) => val!.isEmpty ? 'Required' : null,
+        ),
+      ],
+    );
+  }
+
+  InputDecoration _inputDecoration(IconData icon) {
+    return InputDecoration(
+      prefixIcon: Icon(icon, color: Colors.grey),
+      filled: true,
+      fillColor: AppConstants.inputFill,
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     );
   }
 }

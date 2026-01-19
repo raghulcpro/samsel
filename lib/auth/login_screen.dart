@@ -18,7 +18,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   final TextEditingController _passwordController = TextEditingController();
 
   // Role Selection State
-  String _selectedRole = 'Executive'; // Default value
+  String _selectedRole = 'Executive';
   final List<String> _roles = ['Admin', 'Manager', 'Executive'];
 
   late AnimationController _animationController;
@@ -61,10 +61,11 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       setState(() => _isLoading = true);
       final authService = context.read<AuthService>();
 
-      // Note: In a real app, you might send _selectedRole to the server too
+      // FIX: Now passing the selected role to the service
       final success = await authService.login(
         _emailController.text.trim(),
         _passwordController.text.trim(),
+        _selectedRole, // <--- Added this
       );
 
       if (!success && mounted) {
@@ -134,7 +135,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         ),
                         const SizedBox(height: 40),
 
-                        // --- NEW: ROLE SCROLL BUTTON (DROPDOWN) ---
+                        // --- ROLE SCROLL BUTTON (DROPDOWN) ---
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                           decoration: BoxDecoration(

@@ -14,7 +14,7 @@ class ManagerDashboard extends StatelessWidget {
         title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Manager Dashboard', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text('Central Office Branch', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           ],
         ),
         actions: [
