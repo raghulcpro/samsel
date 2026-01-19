@@ -65,7 +65,7 @@ class ManagerDashboard extends StatelessWidget {
                   const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('\$12,500', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppConstants.textDark)),
+                      Text('₹12,500', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppConstants.textDark)),
                       Text('Total Expenses', style: TextStyle(fontSize: 12, color: AppConstants.textLight)),
                     ],
                   ),

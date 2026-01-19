@@ -21,7 +21,7 @@ class _ExpenseEntryScreenState extends State<ExpenseEntryScreen> {
   String? _selectedTravelMode;
   String? _receiptFileName;
 
-  final List<String> _travelModes = ['Car', 'Train', 'Bus', 'Flight', 'Other'];
+  final List<String> _travelModes = ['Car', 'Train', 'Bus', 'Bike','Rental Bike','Other'];
 
   @override
   void dispose() {
@@ -130,7 +130,7 @@ class _ExpenseEntryScreenState extends State<ExpenseEntryScreen> {
                 decoration: InputDecoration(
                   prefixIcon: const Padding(
                       padding: EdgeInsets.all(12),
-                      child: Text('\$', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppConstants.textDark))
+                      child: Text('₹', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppConstants.textDark))
                   ),
                   filled: true,
                   fillColor: AppConstants.inputFill,
