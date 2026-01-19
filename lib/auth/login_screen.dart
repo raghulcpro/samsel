@@ -26,6 +26,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   late Animation<Offset> _slideAnimation;
 
   // Colors
+  final Color _brandPink = const Color(0xFFD8276A);
   final Color _accentPink = const Color(0xFFF52F78);
   final Color _bgPinkTop = const Color(0xFFFDEFF6);
   final Color _inputFill = const Color(0xFFF2F4F7);
@@ -128,7 +129,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             fontWeight: FontWeight.bold,
                             fontFamily: 'Brush Script MT',
                             letterSpacing: 1.2,
-                            color: _textDark.withValues(alpha: 0.8),
+                            color: _brandPink,
                           ),
                         ),
                         const SizedBox(height: 40),

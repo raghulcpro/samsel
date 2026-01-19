@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  // Brand Colors extracted from your screenshot
+
   static const Color primaryPink = Color(0xFFE91E63);
+  static const Color brandPink = Color(0xFFD8276A);
   static const Color lightPinkCard = Color(0xFFFCE4EC); // Very light pink for stats
   static const Color darkText = Color(0xFF2D2D2D);
   static const Color greyText = Color(0xFF757575);

@@ -38,7 +38,6 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   void _startNavigationTimer() async {
     await Future.delayed(const Duration(seconds: 3));
     if (mounted) {
-      // Use GoRouter context.go to allow main.dart redirect logic to work
       context.go('/login');
     }
   }
@@ -52,30 +51,26 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
-    // --- COLORS MATCHING YOUR LOGIN SCREEN ---
-    // The soft background pink from your login screen
+    // --- BRAND COLORS ---
     const Color bgPinkTop = Color(0xFFFDEFF6);
-    // The vibrant button/logo pink
+    const Color brandPink = Color(0xFFD8276A); // Your requested color
     const Color accentPink = Color(0xFFF52F78);
-    const Color textDark = Color(0xFF555555);
 
     return Scaffold(
       body: Stack(
         children: [
-          // LAYER 1: Light Gradient Background (Matches Login Screen)
+          // LAYER 1: Light Gradient Background
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                // Soft Pink -> White -> Soft Pink
                 colors: [bgPinkTop, Colors.white, bgPinkTop],
               ),
             ),
           ),
 
-          // LAYER 2: Floating "Pink Glass" Bubbles
-          // Modified to be visible on light background (Pink tint)
+          // LAYER 2: Floating Bubbles
           Positioned(
             top: 100,
             left: 40,
@@ -83,8 +78,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                 animation: _bubbleController,
                 size: 60,
                 delay: 0,
-                color: accentPink
-            ),
+                color: accentPink),
           ),
           Positioned(
             bottom: 150,
@@ -93,8 +87,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                 animation: _bubbleController,
                 size: 80,
                 delay: 1.5,
-                color: accentPink
-            ),
+                color: accentPink),
           ),
           Positioned(
             top: 200,
@@ -103,21 +96,10 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                 animation: _bubbleController,
                 size: 40,
                 delay: 2.5,
-                color: accentPink
-            ),
-          ),
-          Positioned(
-            bottom: 80,
-            left: 80,
-            child: _AnimatedBubble(
-                animation: _bubbleController,
-                size: 50,
-                delay: 0.5,
-                color: accentPink
-            ),
+                color: accentPink),
           ),
 
-          // LAYER 3: Central Glowing Logo
+          // LAYER 3: Central Content
           Center(
             child: FadeTransition(
               opacity: _controller,
@@ -126,37 +108,28 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // The Glowing Ring Container
+                    // Glowing Ring Container
                     Container(
                       width: 160,
                       height: 160,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        // Glassy Pink Fill
                         color: accentPink.withValues(alpha: 0.1),
                         border: Border.all(
                             color: accentPink.withValues(alpha: 0.3),
-                            width: 1
-                        ),
+                            width: 1),
                         boxShadow: [
-                          // Strong Pink Glow
                           BoxShadow(
                             color: accentPink.withValues(alpha: 0.3),
                             blurRadius: 30,
                             spreadRadius: 5,
-                          ),
-                          // Subtle Inner White Glow
-                          BoxShadow(
-                            color: Colors.white.withValues(alpha: 0.8),
-                            blurRadius: 20,
-                            spreadRadius: -5,
                           ),
                         ],
                       ),
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
-                          // Central Solid Circle (Like Login Logo)
+                          // Central Solid Circle
                           Container(
                             width: 100,
                             height: 100,
@@ -165,11 +138,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                               gradient: const LinearGradient(
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
-                                  colors: [
-                                    accentPink,
-                                    Color(0xFFFF5996) // Lighter pink for gradient
-                                  ]
-                              ),
+                                  colors: [accentPink, Color(0xFFFF5996)]),
                               boxShadow: [
                                 BoxShadow(
                                   color: accentPink.withValues(alpha: 0.4),
@@ -184,46 +153,26 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                               color: Colors.white,
                             ),
                           ),
-
-                          // Glossy Reflection (Top Left)
-                          Positioned(
-                            top: 35,
-                            left: 50,
-                            child: Container(
-                              width: 30,
-                              height: 15,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.3),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                            ),
-                          ),
                         ],
                       ),
                     ),
                     const SizedBox(height: 30),
 
-                    // SAMSEL Text
-                    // Using Dark Grey to match Login Screen text style
                     Text(
                       'SAMSEL',
                       style: TextStyle(
                         fontFamily: 'Brush Script MT',
-                        fontSize: 42,
-                        color: textDark.withValues(alpha: 0.8),
                         fontWeight: FontWeight.bold,
-                        letterSpacing: 1.5,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    // Tagline
-                    const Text(
-                      'Publication Management System',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: accentPink, // Pink tagline to tie it together
+                        fontSize: 55,
+                        color: brandPink,
                         letterSpacing: 1.2,
-                        fontWeight: FontWeight.w600,
+                        shadows: [
+                          Shadow(
+                            blurRadius: 10.0,
+                            color: brandPink.withValues(alpha: 0.2),
+                            offset: const Offset(0, 0),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -237,7 +186,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   }
 }
 
-// Helper Widget for the "Pink Glass Bubbles"
+// Helper Widget for Animated Bubbles
 class _AnimatedBubble extends StatelessWidget {
   final Animation<double> animation;
   final double size;
@@ -256,7 +205,6 @@ class _AnimatedBubble extends StatelessWidget {
     return AnimatedBuilder(
       animation: animation,
       builder: (context, child) {
-        // Floating Sine Wave Effect
         final double offset = math.sin((animation.value * 2 * math.pi) + delay) * 15;
         return Transform.translate(
           offset: Offset(0, offset),
@@ -268,39 +216,15 @@ class _AnimatedBubble extends StatelessWidget {
         height: size,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          // Pink-tinted Gradient for Glass Effect
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              color.withValues(alpha: 0.15), // Very light pink
-              color.withValues(alpha: 0.05), // Almost clear
+              color.withValues(alpha: 0.15),
+              color.withValues(alpha: 0.05),
             ],
           ),
-          border: Border.all(
-              color: color.withValues(alpha: 0.1),
-              width: 1
-          ),
-        ),
-        // Add a "shine" dot
-        child: Stack(
-          children: [
-            Positioned(
-              top: size * 0.2,
-              left: size * 0.2,
-              child: Container(
-                width: size * 0.25,
-                height: size * 0.25,
-                decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white.withValues(alpha: 0.5), // White reflection
-                    boxShadow: const [
-                      BoxShadow(color: Colors.white, blurRadius: 5)
-                    ]
-                ),
-              ),
-            ),
-          ],
+          border: Border.all(color: color.withValues(alpha: 0.1), width: 1),
         ),
       ),
     );
