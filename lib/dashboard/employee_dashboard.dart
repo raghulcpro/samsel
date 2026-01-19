@@ -123,7 +123,7 @@ class EmployeeDashboard extends StatelessWidget {
                       children: [
                         _buildSummaryItem('Visits', '3'),
                         Container(width: 1, height: 40, color: Colors.white24),
-                        _buildSummaryItem('Expenses', '\$45'),
+                        _buildSummaryItem('Expenses', '₹45'),
                       ],
                     ),
                   ],
