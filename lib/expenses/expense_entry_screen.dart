@@ -12,16 +12,23 @@ class ExpenseEntryScreen extends StatefulWidget {
 
 class _ExpenseEntryScreenState extends State<ExpenseEntryScreen> {
   final _formKey = GlobalKey<FormState>();
+
+  // -- Controllers --
   final _amountController = TextEditingController();
   final _dateController = TextEditingController();
   final _remarksController = TextEditingController();
 
-  // State variables
+  // -- State Variables --
   DateTime? _selectedDate;
-  String? _selectedTravelMode;
-  String? _receiptFileName;
 
-  final List<String> _travelModes = ['Car', 'Train', 'Bus', 'Bike','Rental Bike','Other'];
+  // -- Dynamic Dropdown State --
+  String _selectedCategory = 'Travel';
+  String? _selectedSubCategory;
+
+  // -- Lists --
+  final List<String> _categories = ['Travel', 'Food', 'Lodging', 'Other'];
+  final List<String> _travelModes = ['Car', 'Train', 'Bus', 'Flight', 'Auto/Cab'];
+  final List<String> _foodTypes = ['Breakfast', 'Lunch', 'Dinner', 'Client Meeting', 'Snacks/Tea'];
 
   @override
   void dispose() {
@@ -37,16 +44,13 @@ class _ExpenseEntryScreenState extends State<ExpenseEntryScreen> {
       initialDate: _selectedDate ?? DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(primary: AppConstants.accentColorLight),
-            // FIX: dialogBackgroundColor is deprecated. Use dialogTheme.
-            dialogTheme: const DialogThemeData(backgroundColor: Colors.white),
-          ),
-          child: child!,
-        );
-      },
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: const ColorScheme.light(primary: AppConstants.accentColorLight),
+          dialogTheme: const DialogThemeData(backgroundColor: Colors.white),
+        ),
+        child: child!,
+      ),
     );
     if (picked != null) {
       setState(() {
@@ -56,21 +60,10 @@ class _ExpenseEntryScreenState extends State<ExpenseEntryScreen> {
     }
   }
 
-  void _pickReceipt() {
-    setState(() => _receiptFileName = 'receipt.pdf');
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Receipt Attached')),
-    );
-  }
-
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      // FIX: Using the "unused" fields here to simulate real logic
-      debugPrint('Submitting Date: $_selectedDate');
-      debugPrint('Receipt: $_receiptFileName');
-
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Expense Submitted!'), backgroundColor: Colors.green),
+        const SnackBar(content: Text('Expense Submitted Successfully!'), backgroundColor: Colors.green),
       );
       Navigator.of(context).pop();
     }
@@ -94,7 +87,7 @@ class _ExpenseEntryScreenState extends State<ExpenseEntryScreen> {
             padding: const EdgeInsets.all(24.0),
             physics: const BouncingScrollPhysics(),
             children: [
-              // Banner
+              // --- BANNER ---
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(color: AppConstants.primaryBgTop, borderRadius: BorderRadius.circular(16)),
@@ -103,15 +96,21 @@ class _ExpenseEntryScreenState extends State<ExpenseEntryScreen> {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                      child: const Icon(Icons.wallet_rounded, color: AppConstants.accentColorLight),
+                      child: Icon(
+                          _selectedCategory == 'Food' ? Icons.restaurant_rounded : Icons.wallet_rounded,
+                          color: AppConstants.accentColorLight
+                      ),
                     ),
                     const SizedBox(width: 16),
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("Expense Claim", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppConstants.textDark)),
-                          Text("Fill details for reimbursement", style: TextStyle(fontSize: 12, color: AppConstants.textLight)),
+                          Text(
+                              "$_selectedCategory Claim",
+                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppConstants.textDark)
+                          ),
+                          const Text("Fill details for reimbursement", style: TextStyle(fontSize: 12, color: AppConstants.textLight)),
                         ],
                       ),
                     )
@@ -120,6 +119,64 @@ class _ExpenseEntryScreenState extends State<ExpenseEntryScreen> {
               ),
               const SizedBox(height: 24),
 
+              // --- 1. CATEGORY SELECTION ---
+              const Text('Expense Category', style: TextStyle(color: AppConstants.textDark, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 50,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _categories.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 10),
+                  itemBuilder: (context, index) {
+                    final cat = _categories[index];
+                    final isSelected = _selectedCategory == cat;
+                    return ChoiceChip(
+                      label: Text(cat),
+                      selected: isSelected,
+                      selectedColor: AppConstants.accentColorLight,
+                      labelStyle: TextStyle(
+                          color: isSelected ? Colors.white : AppConstants.textDark,
+                          fontWeight: FontWeight.bold
+                      ),
+                      backgroundColor: AppConstants.inputFill,
+                      onSelected: (bool selected) {
+                        if (selected) {
+                          setState(() {
+                            _selectedCategory = cat;
+                            _selectedSubCategory = null;
+                          });
+                        }
+                      },
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: BorderSide.none),
+                      showCheckmark: false,
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // --- 2. DYNAMIC SUB-CATEGORY ---
+              if (_selectedCategory == 'Travel') ...[
+                const Text('Travel Mode', style: TextStyle(color: AppConstants.textDark, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 8),
+                _buildDropdown(
+                  hint: 'Select Mode (e.g. Bus, Train)',
+                  icon: Icons.commute_outlined,
+                  items: _travelModes,
+                ),
+              ] else if (_selectedCategory == 'Food') ...[
+                const Text('Meal Type', style: TextStyle(color: AppConstants.textDark, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 8),
+                _buildDropdown(
+                  hint: 'Select Meal (e.g. Lunch, Client Treat)',
+                  icon: Icons.restaurant_menu_rounded,
+                  items: _foodTypes,
+                ),
+              ],
+              const SizedBox(height: 20),
+
+              // --- 3. AMOUNT (Rupees) ---
               const Text('Total Amount', style: TextStyle(color: AppConstants.textDark, fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),
               TextFormField(
@@ -140,52 +197,15 @@ class _ExpenseEntryScreenState extends State<ExpenseEntryScreen> {
               ),
               const SizedBox(height: 20),
 
-              const Text('Travel Mode', style: TextStyle(color: AppConstants.textDark, fontWeight: FontWeight.w600)),
-              const SizedBox(height: 8),
-
-              // FIX: Used initialValue instead of value to fix deprecation warning
-              DropdownButtonFormField<String>(
-                initialValue: _selectedTravelMode,
-                decoration: _inputDecoration(Icons.commute_outlined),
-                dropdownColor: Colors.white,
-                items: _travelModes.map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
-                onChanged: (val) => setState(() => _selectedTravelMode = val),
-              ),
-              const SizedBox(height: 20),
-
+              // --- 4. DATE ---
               _buildField('Date', _dateController, Icons.calendar_today_rounded, isReadOnly: true, onTap: () => _selectDate(context)),
               const SizedBox(height: 20),
 
+              // --- 5. REMARKS ---
               _buildField('Remarks', _remarksController, Icons.notes, maxLines: 3),
-              const SizedBox(height: 24),
+              const SizedBox(height: 40),
 
-              // Attachment Button (using _receiptFileName)
-              InkWell(
-                onTap: _pickReceipt,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppConstants.accentColorLight.withValues(alpha: 0.3)),
-                  ),
-                  child: Column(
-                    children: [
-                      Icon(
-                          _receiptFileName == null ? Icons.cloud_upload_outlined : Icons.check_circle,
-                          color: AppConstants.accentColorLight, size: 32
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        _receiptFileName ?? 'Upload Receipt',
-                        style: const TextStyle(color: AppConstants.accentColorLight, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 32),
-
+              // --- SUBMIT BUTTON ---
               SizedBox(
                 height: 56,
                 child: ElevatedButton(
@@ -205,6 +225,8 @@ class _ExpenseEntryScreenState extends State<ExpenseEntryScreen> {
     );
   }
 
+  // --- Widgets ---
+
   Widget _buildField(String label, TextEditingController controller, IconData icon, {bool isReadOnly = false, VoidCallback? onTap, int maxLines = 1}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -220,6 +242,19 @@ class _ExpenseEntryScreenState extends State<ExpenseEntryScreen> {
           validator: (val) => val!.isEmpty ? 'Required' : null,
         ),
       ],
+    );
+  }
+
+  Widget _buildDropdown({required String hint, required IconData icon, required List<String> items}) {
+    return DropdownButtonFormField<String>(
+      key: ValueKey(_selectedCategory),
+      initialValue: _selectedSubCategory,
+      decoration: _inputDecoration(icon),
+      dropdownColor: Colors.white,
+      hint: Text(hint, style: const TextStyle(fontSize: 14, color: Colors.grey)),
+      items: items.map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
+      onChanged: (val) => setState(() => _selectedSubCategory = val),
+      validator: (val) => val == null ? 'Please select option' : null,
     );
   }
 
