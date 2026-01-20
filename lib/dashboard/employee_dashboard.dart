@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sammsel/auth/auth_service.dart';
 import 'package:sammsel/core/constants/app_constants.dart';
-// Removed unused custom_card import
+import 'package:sammsel/widgets/custom_card.dart';
 
 class EmployeeDashboard extends StatelessWidget {
   const EmployeeDashboard({super.key});
@@ -16,48 +16,40 @@ class EmployeeDashboard extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        title: const Text('Employee Dashboard'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: false,
+      ),
       body: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // HEADER
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Column( // Added const
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Good Morning,',
-                        style: TextStyle(color: AppConstants.textLight, fontSize: 16),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        employeeName,
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: AppConstants.textDark,
-                        ),
-                      ),
-                    ],
-                  ),
-                  CircleAvatar(
-                    radius: 24,
-                    backgroundColor: AppConstants.accentColorLight.withValues(alpha: 0.1),
-                    child: const Icon(Icons.notifications_none_rounded, color: AppConstants.accentColorLight),
-                  )
-                ],
+              const SizedBox(height: 10),
+              Text(
+                'Good morning,',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.white70),
               ),
-              const SizedBox(height: 32),
+              Text(
+                employeeName,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 30),
 
-              // QUICK ACTIONS
-              const Text(
+              // Quick Actions Section
+              Text(
                 'Quick Actions',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppConstants.textDark),
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
               ),
               const SizedBox(height: 16),
               Row(
@@ -68,7 +60,8 @@ class EmployeeDashboard extends StatelessWidget {
                       label: 'Add Visit',
                       icon: Icons.add_location_alt_rounded,
                       color: AppConstants.accentColorLight,
-                      onTap: () => context.go('/visit_entry'),
+                      // Use push so "Back" button works
+                      onTap: () => context.push('/visit_entry'),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -77,57 +70,93 @@ class EmployeeDashboard extends StatelessWidget {
                       context,
                       label: 'Add Expense',
                       icon: Icons.account_balance_wallet_rounded,
-                      color: Colors.blueAccent,
-                      onTap: () => context.go('/expense_entry'),
+                      color: AppConstants.accentColorDark,
+                      // Use push so "Back" button works
+                      onTap: () => context.push('/expense_entry'),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 24),
 
-              // SUMMARY CARD
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [AppConstants.accentColorLight, AppConstants.accentColorDark],
-                  ),
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppConstants.accentColorLight.withValues(alpha: 0.4),
-                      blurRadius: 15,
-                      offset: const Offset(0, 8),
-                    )
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    Row(
+              // History Card
+              CustomCard(
+                child: InkWell(
+                  // Reports is a main tab, so 'go' is correct
+                  onTap: () => context.go('/reports'),
+                  borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
+                    child: Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), shape: BoxShape.circle),
-                          child: const Icon(Icons.bar_chart_rounded, color: Colors.white),
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: AppConstants.accentColorDark.withValues(alpha: 0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.history_rounded, color: AppConstants.accentColorDark),
                         ),
-                        const SizedBox(width: 12),
-                        const Text(
-                          "Today's Overview",
-                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Text(
+                            'View My History',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                          ),
                         ),
+                        const Icon(Icons.chevron_right_rounded, color: Colors.white30),
                       ],
                     ),
-                    const SizedBox(height: 24),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _buildSummaryItem('Visits', '3'),
-                        Container(width: 1, height: 40, color: Colors.white24),
-                        _buildSummaryItem('Expenses', '₹45'),
-                      ],
-                    ),
-                  ],
+                  ),
                 ),
+              ),
+
+              const SizedBox(height: 32),
+
+              // Summary Section
+              Text(
+                'Today Summary',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              CustomCard(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      _buildSummaryRow(Icons.check_circle_outline, 'Visits Completed', '3'),
+                      const Divider(color: Colors.white10, height: 24),
+                      _buildSummaryRow(Icons.payments_outlined, 'Expenses Logged', '₹45.50'),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 100),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // --- Helper Methods (Now correctly placed inside the class) ---
+
+  Widget _buildActionButton(BuildContext context, {required String label, required IconData icon, required Color color, required VoidCallback onTap}) {
+    return CustomCard(
+      padding: EdgeInsets.zero,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: color, size: 36),
+              const SizedBox(height: 12),
+              Text(
+                label,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
               ),
             ],
           ),
@@ -136,57 +165,15 @@ class EmployeeDashboard extends StatelessWidget {
     );
   }
 
-  Widget _buildSummaryItem(String label, String value) {
-    return Column(
+  Widget _buildSummaryRow(IconData icon, String title, String value) {
+    return Row(
       children: [
-        Text(value, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
-        const SizedBox(height: 4),
-        Text(label, style: const TextStyle(color: Colors.white70, fontSize: 13)),
+        Icon(icon, color: Colors.white38, size: 20),
+        const SizedBox(width: 12),
+        Text(title, style: const TextStyle(color: Colors.white70)),
+        const Spacer(),
+        Text(value, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
       ],
-    );
-  }
-
-  Widget _buildActionButton(BuildContext context, {required String label, required IconData icon, required Color color, required VoidCallback onTap}) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 5),
-          )
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(24),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(icon, color: color, size: 28),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  label,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppConstants.textDark),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
