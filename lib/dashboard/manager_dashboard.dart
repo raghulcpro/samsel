@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sammsel/core/constants/app_constants.dart';
-
+import 'package:sammsel/widgets/custom_card.dart';
 
 class ManagerDashboard extends StatelessWidget {
   const ManagerDashboard({super.key});
@@ -8,49 +8,45 @@ class ManagerDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent, // Uses MainLayout gradient
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        title: const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Central Office', style: TextStyle(color: AppConstants.textLight, fontSize: 14)),
+            Text('Manager Dashboard', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppConstants.textDark)),
+          ],
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: false,
+        actions: [
+          CircleAvatar(
+            radius: 20,
+            backgroundColor: AppConstants.accentColorLight.withValues(alpha: 0.1),
+            child: const Icon(Icons.notifications_none_rounded, color: AppConstants.accentColorLight),
+          ),
+          const SizedBox(width: 16),
+        ],
+      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(20.0),
         physics: const BouncingScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Central Office', style: TextStyle(color: AppConstants.textLight)),
-                    Text('Manager Dashboard', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppConstants.textDark)),
-                  ],
-                ),
-                Icon(Icons.business_rounded, color: AppConstants.accentColorLight, size: 32),
-              ],
-            ),
-            const SizedBox(height: 32),
-
-            // 1. Stats Row
             Row(
               children: [
                 Expanded(child: _buildStatBox('42', 'Employees', Icons.people_outline)),
                 const SizedBox(width: 16),
-                Expanded(child: _buildStatBox('28', 'Visits', Icons.calendar_today_outlined)),
+                Expanded(child: _buildStatBox('28', 'Visits Today', Icons.calendar_today_outlined)),
               ],
             ),
             const SizedBox(height: 16),
 
-            // 2. Total Expenses Box
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(color: Colors.grey.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 5))
-                ],
-              ),
+            CustomCard(
+              color: Colors.white,
+              hasShadow: true,
               child: Row(
                 children: [
                   Container(
@@ -74,11 +70,9 @@ class ManagerDashboard extends StatelessWidget {
             ),
             const SizedBox(height: 32),
 
-            // 3. Employees List Header
             const Text('Team Status', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppConstants.textDark)),
             const SizedBox(height: 16),
 
-            // 4. Employee List
             Container(
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -99,29 +93,20 @@ class ManagerDashboard extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
-        backgroundColor: AppConstants.accentColorLight,
-        icon: const Icon(Icons.download_rounded, color: Colors.white),
-        label: const Text('Download Report', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-      ),
     );
   }
 
   Widget _buildStatBox(String value, String label, IconData icon) {
-    return Container(
+    return CustomCard(
+      color: Colors.white,
+      hasShadow: true,
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [BoxShadow(color: Colors.grey.withValues(alpha: 0.05), blurRadius: 10)],
-      ),
       child: Column(
         children: [
           Icon(icon, color: AppConstants.accentColorLight, size: 28),
           const SizedBox(height: 12),
           Text(value, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: AppConstants.textDark)),
-          Text(label, style: const TextStyle(fontSize: 12, color: AppConstants.textLight)),
+          Text(label, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, color: AppConstants.textLight)),
         ],
       ),
     );
@@ -129,7 +114,6 @@ class ManagerDashboard extends StatelessWidget {
 
   Widget _buildEmployeeTile(String name, String id, bool visited) {
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       leading: CircleAvatar(
         backgroundColor: AppConstants.inputFill,
         child: Text(name[0], style: const TextStyle(color: AppConstants.textDark, fontWeight: FontWeight.bold)),

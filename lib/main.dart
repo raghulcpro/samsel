@@ -48,17 +48,15 @@ class _SamselAppState extends State<SamselApp> {
   @override
   void initState() {
     super.initState();
-    // Access authService to build the router
     final authService = Provider.of<AuthService>(context, listen: false);
     _router = _buildRouter(authService);
   }
 
   GoRouter _buildRouter(AuthService authService) {
     return GoRouter(
-      // This listener ensures the router refreshes when auth state changes (login/logout)
       refreshListenable: GoRouterRefreshStream(authService.currentUserRole),
       initialLocation: '/splash',
-      debugLogDiagnostics: true, // Helpful for debugging routing issues
+      debugLogDiagnostics: true,
       routes: [
         GoRoute(
           path: '/splash',
@@ -72,10 +70,23 @@ class _SamselAppState extends State<SamselApp> {
           path: '/signup',
           builder: (context, state) => const SignupScreen(),
         ),
+
+        // --- CRITICAL FIX: MOVED OUTSIDE SHELL ROUTE ---
+        // This makes them "New Screens" on top of the dashboard
+        // so the Back Button (<) appears correctly.
+        GoRoute(
+          path: '/visit_entry',
+          builder: (context, state) => const VisitEntryScreen(),
+        ),
+        GoRoute(
+          path: '/expense_entry',
+          builder: (context, state) => const ExpenseEntryScreen(),
+        ),
+        // -----------------------------------------------
+
         // ShellRoute wraps these pages with the MainLayout (Sidebar/Navigation)
         ShellRoute(
           builder: (context, state, child) {
-            // Only show MainLayout if user has a role, otherwise fallback to Login
             return authService.currentRole != UserRole.none
                 ? MainLayout(child: child)
                 : const LoginScreen();
@@ -101,33 +112,21 @@ class _SamselAppState extends State<SamselApp> {
               path: '/profile',
               builder: (context, state) => const ProfileScreen(),
             ),
-            GoRoute(
-              path: '/visit_entry',
-              builder: (context, state) => const VisitEntryScreen(),
-            ),
-            GoRoute(
-              path: '/expense_entry',
-              builder: (context, state) => const ExpenseEntryScreen(),
-            ),
           ],
         ),
       ],
-      // Centralized Redirect Logic
       redirect: (context, state) {
         final loggedIn = authService.currentRole != UserRole.none;
         final isGoingToLogin = state.uri.path == '/login';
         final isGoingToSignup = state.uri.path == '/signup';
         final isGoingToSplash = state.uri.path == '/splash';
 
-        // 1. Allow Splash Screen to run its course
         if (isGoingToSplash) return null;
 
-        // 2. If NOT logged in and trying to access private routes, force Login
         if (!loggedIn && !isGoingToLogin && !isGoingToSignup) {
           return '/login';
         }
 
-        // 3. If ALREADY logged in and trying to access public auth pages, redirect to Dashboard
         if (loggedIn && (isGoingToLogin || isGoingToSignup)) {
           switch (authService.currentRole) {
             case UserRole.superAdmin:
@@ -140,8 +139,6 @@ class _SamselAppState extends State<SamselApp> {
               return '/login';
           }
         }
-
-        // 4. Default: Allow navigation
         return null;
       },
     );
@@ -152,13 +149,12 @@ class _SamselAppState extends State<SamselApp> {
     return MaterialApp.router(
       title: AppConstants.appTitle,
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
+      theme: AppTheme.lightTheme, // Now works because we updated AppTheme
       routerConfig: _router,
     );
   }
 }
 
-/// Helper class to convert a Stream into a Listenable for GoRouter
 class GoRouterRefreshStream extends ChangeNotifier {
   GoRouterRefreshStream(Stream<dynamic> stream) {
     notifyListeners();
@@ -166,9 +162,7 @@ class GoRouterRefreshStream extends ChangeNotifier {
           (dynamic _) => notifyListeners(),
     );
   }
-
   late final StreamSubscription<dynamic> _subscription;
-
   @override
   void dispose() {
     _subscription.cancel();

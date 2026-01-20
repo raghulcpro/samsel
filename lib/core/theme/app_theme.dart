@@ -1,69 +1,50 @@
 import 'package:flutter/material.dart';
+import 'package:sammsel/core/constants/app_constants.dart';
 
 class AppTheme {
+  static ThemeData get lightTheme {
+    return ThemeData(
+      primaryColor: AppConstants.accentColorLight,
+      scaffoldBackgroundColor: Colors.white,
 
-  static const Color primaryPink = Color(0xFFE91E63);
-  static const Color brandPink = Color(0xFFD8276A);
-  static const Color lightPinkCard = Color(0xFFFCE4EC); // Very light pink for stats
-  static const Color darkText = Color(0xFF2D2D2D);
-  static const Color greyText = Color(0xFF757575);
-  static const Color scaffoldBackground = Colors.white;
-
-  static ThemeData lightTheme = ThemeData(
-    useMaterial3: true,
-    brightness: Brightness.light,
-    scaffoldBackgroundColor: scaffoldBackground,
-    primaryColor: primaryPink,
-    colorScheme: const ColorScheme.light(
-      primary: primaryPink,
-      secondary: Color(0xFFFF4081),
-      surface: Colors.white,
-      onSurface: darkText,
-      error: Colors.redAccent,
-    ),
-    appBarTheme: const AppBarTheme(
-      backgroundColor: Colors.white,
-      foregroundColor: darkText,
-      elevation: 0,
-      centerTitle: false,
-      titleTextStyle: TextStyle(
-        color: darkText,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+      // Define the Color Scheme
+      colorScheme: const ColorScheme.light(
+        primary: AppConstants.accentColorLight,
+        secondary: AppConstants.accentColorDark,
+        surface: Colors.white,
+        onSurface: AppConstants.textDark,
       ),
-      iconTheme: IconThemeData(color: darkText),
-    ),
-    textTheme: const TextTheme(
-      displayLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: darkText),
-      headlineMedium: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: darkText),
-      titleLarge: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: darkText),
-      titleMedium: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: darkText),
-      bodyLarge: TextStyle(fontSize: 16, color: darkText),
-      bodyMedium: TextStyle(fontSize: 14, color: greyText),
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: primaryPink,
-        foregroundColor: Colors.white,
+
+      // App Bar Theme
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        centerTitle: true,
+        iconTheme: IconThemeData(color: AppConstants.textDark),
+        titleTextStyle: TextStyle(
+          color: AppConstants.textDark,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
       ),
-    ),
-    cardTheme: CardThemeData(
-      color: Colors.white,
-      elevation: 0, // Flat style as per screenshot
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-    ),
-    inputDecorationTheme: InputDecorationTheme(
-      filled: true,
-      fillColor: const Color(0xFFF5F5F5),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide.none,
+
+      // Input Decoration Theme (Matches your login fields)
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: AppConstants.inputFill,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: AppConstants.accentColorLight, width: 2),
+        ),
       ),
-      contentPadding: const EdgeInsets.all(20),
-    ),
-  );
+    );
+  }
 }

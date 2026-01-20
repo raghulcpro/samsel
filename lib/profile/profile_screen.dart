@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:sammsel/auth/auth_service.dart';
 import 'package:sammsel/core/constants/app_constants.dart';
 
-
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 

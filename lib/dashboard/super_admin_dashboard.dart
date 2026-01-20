@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sammsel/core/constants/app_constants.dart';
+import 'package:sammsel/widgets/custom_card.dart';
 
 class SuperAdminDashboard extends StatelessWidget {
   const SuperAdminDashboard({super.key});
@@ -9,30 +10,37 @@ class SuperAdminDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        title: const Row(
+          children: [
+            Icon(Icons.shield_rounded, color: AppConstants.accentColorLight),
+            SizedBox(width: 8),
+            Text('Admin Console', style: TextStyle(fontWeight: FontWeight.bold, color: AppConstants.textDark)),
+          ],
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: false,
+        actions: [
+          IconButton(
+              onPressed: () => context.go('/profile'),
+              icon: const Icon(Icons.person_outline_rounded, color: AppConstants.textDark)
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(20.0),
         physics: const BouncingScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
-            const Row(
-              children: [
-                Icon(Icons.shield_rounded, color: AppConstants.accentColorLight, size: 28),
-                SizedBox(width: 12),
-                Text('Admin Console', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppConstants.textDark)),
-              ],
-            ),
-            const SizedBox(height: 24),
-
-            // 1. Top Stats Grid
             GridView.count(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               crossAxisCount: 2,
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
-              childAspectRatio: 1.1,
+              childAspectRatio: 1.0,
               children: [
                 _buildPinkStatCard('Locations', '142', '+12%', Icons.location_on_outlined),
                 _buildPinkStatCard('Managers', '28', '+5%', Icons.business_center_outlined),
@@ -42,7 +50,6 @@ class SuperAdminDashboard extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // 2. Navigation Actions
             const Text("Quick Management", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppConstants.textDark)),
             const SizedBox(height: 16),
 
@@ -56,8 +63,12 @@ class SuperAdminDashboard extends StatelessWidget {
                 children: [
                   _buildNavTile(context, 'Manage Locations', Icons.map_outlined, () {}),
                   Divider(height: 1, color: Colors.grey.withValues(alpha: 0.1)),
-                  _buildNavTile(context, 'Manage Employees', Icons.badge_outlined, () => context.go('/employee_dashboard')),
+
+                  // Use push here to stack the screen so they can come back
+                  _buildNavTile(context, 'Manage Employees', Icons.badge_outlined, () => context.push('/employee_dashboard')),
+
                   Divider(height: 1, color: Colors.grey.withValues(alpha: 0.1)),
+
                   _buildNavTile(context, 'System Reports', Icons.file_copy_outlined, () => context.go('/reports')),
                 ],
               ),
@@ -70,14 +81,10 @@ class SuperAdminDashboard extends StatelessWidget {
   }
 
   Widget _buildPinkStatCard(String title, String value, String growth, IconData icon) {
-    return Container(
+    return CustomCard(
+      color: Colors.white,
+      hasShadow: true,
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [BoxShadow(color: Colors.grey.withValues(alpha: 0.05), blurRadius: 10)],
-        border: Border.all(color: AppConstants.primaryBgTop),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -86,7 +93,14 @@ class SuperAdminDashboard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Icon(icon, color: AppConstants.accentColorLight, size: 24),
-              Text(growth, style: const TextStyle(color: Colors.green, fontSize: 12, fontWeight: FontWeight.bold)),
+              Text(
+                  growth,
+                  style: TextStyle(
+                      color: growth.contains('+') ? Colors.green : Colors.red,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold
+                  )
+              ),
             ],
           ),
           Column(

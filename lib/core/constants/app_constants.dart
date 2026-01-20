@@ -9,13 +9,13 @@ enum UserRole {
 
 class AppConstants {
   // --- STRINGS ---
-  static const String appTitle = 'SAMSEL'; // Fixed: Added this back
+  static const String appTitle = 'SAMSEL';
 
   // --- NEW LIGHT THEME PALETTE ---
-  static const Color primaryBgTop = Color(0xFFFDEFF6);
-  static const Color primaryBgBottom = Color(0xFFFFFFFF);
+  static const Color primaryBgTop = Color(0xFFFDEFF6); // Soft Pink
+  static const Color primaryBgBottom = Colors.white;
 
-  static const Color accentColorLight = Color(0xFFF52F78);
+  static const Color accentColorLight = Color(0xFFF52F78); // Main Pink
   static const Color accentColorDark = Color(0xFFFF5996);
 
   static const Color textDark = Color(0xFF555555);
