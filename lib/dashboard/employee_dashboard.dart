@@ -12,7 +12,7 @@ class EmployeeDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     // ignore: unused_local_variable
     final authService = Provider.of<AuthService>(context);
-    const String employeeName = 'Alice Smith';
+    const String employeeName = 'Ravi Kumar';
 
     return Scaffold(
       backgroundColor: Colors.transparent,
