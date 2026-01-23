@@ -24,6 +24,7 @@ import 'package:sammsel/reports/reports_screen.dart';
 import 'package:sammsel/profile/profile_screen.dart';
 import 'package:sammsel/visits/visit_entry_screen.dart';
 import 'package:sammsel/expenses/expense_entry_screen.dart';
+import 'package:sammsel/tasks/task_assignment_screen.dart'; // NEW IMPORT
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -71,9 +72,9 @@ class _SamselAppState extends State<SamselApp> {
           builder: (context, state) => const SignupScreen(),
         ),
 
-        // --- CRITICAL FIX: MOVED OUTSIDE SHELL ROUTE ---
-        // This makes them "New Screens" on top of the dashboard
-        // so the Back Button (<) appears correctly.
+        // --- STANDALONE SCREENS (Outside ShellRoute) ---
+        // These open as full pages with a back button.
+
         GoRoute(
           path: '/visit_entry',
           builder: (context, state) => const VisitEntryScreen(),
@@ -82,6 +83,13 @@ class _SamselAppState extends State<SamselApp> {
           path: '/expense_entry',
           builder: (context, state) => const ExpenseEntryScreen(),
         ),
+
+        // NEW: Task Assignment Route
+        GoRoute(
+          path: '/task_assignment',
+          builder: (context, state) => const TaskAssignmentScreen(),
+        ),
+
         // -----------------------------------------------
 
         // ShellRoute wraps these pages with the MainLayout (Sidebar/Navigation)
@@ -149,7 +157,7 @@ class _SamselAppState extends State<SamselApp> {
     return MaterialApp.router(
       title: AppConstants.appTitle,
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme, // Now works because we updated AppTheme
+      theme: AppTheme.lightTheme,
       routerConfig: _router,
     );
   }

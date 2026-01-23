@@ -4,6 +4,25 @@ import 'package:go_router/go_router.dart';
 import 'package:sammsel/auth/auth_service.dart';
 import 'package:sammsel/core/constants/app_constants.dart';
 import 'package:sammsel/widgets/custom_card.dart';
+import 'package:intl/intl.dart';
+
+// Mock Data for Tasks (In real app, fetch from DB)
+final List<Map<String, dynamic>> _mockEmployeeTasks = [
+  {
+    'title': 'Visit St. Josephs',
+    'assigner': 'Manager John',
+    'due': DateTime.now().add(const Duration(days: 1)),
+    'priority': 'High',
+    'status': 'Pending'
+  },
+  {
+    'title': 'Submit Expense Report',
+    'assigner': 'Manager Sarah',
+    'due': DateTime.now().add(const Duration(days: 3)),
+    'priority': 'Medium',
+    'status': 'Completed'
+  },
+];
 
 class EmployeeDashboard extends StatelessWidget {
   const EmployeeDashboard({super.key});
@@ -12,7 +31,7 @@ class EmployeeDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     // ignore: unused_local_variable
     final authService = Provider.of<AuthService>(context);
-    const String employeeName = 'Ravi Kumar';
+    const String employeeName = 'Alice Smith';
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -60,7 +79,6 @@ class EmployeeDashboard extends StatelessWidget {
                       label: 'Add Visit',
                       icon: Icons.add_location_alt_rounded,
                       color: AppConstants.accentColorLight,
-                      // Use push so "Back" button works
                       onTap: () => context.push('/visit_entry'),
                     ),
                   ),
@@ -71,65 +89,84 @@ class EmployeeDashboard extends StatelessWidget {
                       label: 'Add Expense',
                       icon: Icons.account_balance_wallet_rounded,
                       color: AppConstants.accentColorDark,
-                      // Use push so "Back" button works
                       onTap: () => context.push('/expense_entry'),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
-
-              // History Card
-              CustomCard(
-                child: InkWell(
-                  // Reports is a main tab, so 'go' is correct
-                  onTap: () => context.go('/reports'),
-                  borderRadius: BorderRadius.circular(AppConstants.borderRadius),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: AppConstants.accentColorDark.withValues(alpha: 0.1),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.history_rounded, color: AppConstants.accentColorDark),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Text(
-                            'View My History',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                        const Icon(Icons.chevron_right_rounded, color: Colors.white30),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
               const SizedBox(height: 32),
 
-              // Summary Section
+              // --- NEW: ASSIGNED TASKS SECTION ---
               Text(
-                'Today Summary',
+                'My Assigned Tasks',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
-              CustomCard(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      _buildSummaryRow(Icons.check_circle_outline, 'Visits Completed', '3'),
-                      const Divider(color: Colors.white10, height: 24),
-                      _buildSummaryRow(Icons.payments_outlined, 'Expenses Logged', '₹45.50'),
-                    ],
-                  ),
-                ),
+
+              ListView.separated(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: _mockEmployeeTasks.length,
+                separatorBuilder: (ctx, index) => const SizedBox(height: 10),
+                itemBuilder: (context, index) {
+                  final task = _mockEmployeeTasks[index];
+                  return CustomCard(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                                task['title'],
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: task['priority'] == 'High' ? Colors.red.withOpacity(0.1) : Colors.orange.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                task['priority'],
+                                style: TextStyle(
+                                    color: task['priority'] == 'High' ? Colors.red : Colors.orange,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          "Assigned by: ${task['assigner']}",
+                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Due: ${DateFormat('MMM dd').format(task['due'])}",
+                              style: const TextStyle(fontSize: 12, color: Colors.white70),
+                            ),
+                            if (task['status'] == 'Pending')
+                              InkWell(
+                                onTap: () {
+                                  // Mark as done logic
+                                },
+                                child: const Text("Mark Done", style: TextStyle(color: AppConstants.accentColorLight, fontWeight: FontWeight.bold)),
+                              )
+                            else
+                              const Icon(Icons.check_circle, color: Colors.green, size: 18)
+                          ],
+                        )
+                      ],
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: 100),
             ],
@@ -139,8 +176,7 @@ class EmployeeDashboard extends StatelessWidget {
     );
   }
 
-  // --- Helper Methods (Now correctly placed inside the class) ---
-
+  // --- MISSING METHODS RESTORED ---
   Widget _buildActionButton(BuildContext context, {required String label, required IconData icon, required Color color, required VoidCallback onTap}) {
     return CustomCard(
       padding: EdgeInsets.zero,
